@@ -1,0 +1,15 @@
+{
+  "name": "parampara-ar-lite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PARAMPARA AR LITE - National Living Heritage Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:all": "cmd /c run-all.bat",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "frontend": "npm --prefix frontend run dev",
+    "backend": "powershell -Command \"$env:PYTHONPATH='backend'; .venv/Scripts/python.exe -m uvicorn app.main:app --reload --port 8000\"",
+    "start": "npm run dev"
+  }
+}
