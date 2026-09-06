@@ -44,6 +44,7 @@ app.include_router(admin.router)
 app.include_router(sources.router)
 app.include_router(narration.router)
 
+@app.get("/healthz", tags=["System"])
 @app.get("/api/health", tags=["System"])
 def health_check():
     return {
