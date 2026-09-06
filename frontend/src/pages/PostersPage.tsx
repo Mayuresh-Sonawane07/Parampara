@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { QrCode, Printer, Sparkles, ExternalLink, Download } from 'lucide-react';
 
@@ -7,15 +7,15 @@ export const PostersPage: React.FC = () => {
 
   const posters = [
     {
-      slug: 'warli',
-      title: 'WARLI PAINTING',
-      region: 'WEST INDIA • MAHARASHTRA',
-      invitation: 'Discover the sacred symbols, Tarpa dance spiral, and living stories behind this traditional Adivasi artwork.',
-      qrUrl: '/qr-assets/warli.png',
-      route: '/scan/warli',
-      image: '/ar-assets/warli-target.jpg',
-      experienceLabel: 'Flagship WebAR Experience',
-      sourceNote: 'INTACH Dahanu Chapter Cultural Mapping & GI Registry No. 342'
+      slug: 'thathera',
+      title: 'THATHERA METAL CRAFT',
+      region: 'NORTH INDIA • PUNJAB',
+      invitation: 'Journey through the 8 traditional stages of hand-hammered brass and copper utensil making in Jandiala Guru.',
+      qrUrl: '/qr-assets/thathera.png',
+      route: '/scan/thathera',
+      image: '/heritage-images/thathera.jpg',
+      experienceLabel: '8-Stage Craft Journey',
+      sourceNote: 'UNESCO Representative List File 00845 & Sangeet Natak Akademi'
     },
     {
       slug: 'toda',
@@ -24,20 +24,9 @@ export const PostersPage: React.FC = () => {
       invitation: 'Explore the sacred counted-thread geometry and floral shola motifs of the Nilgiri pastoral community.',
       qrUrl: '/qr-assets/toda.png',
       route: '/scan/toda',
-      image: 'https://images.unsplash.com/photo-1606744837616-56c9a5c6a6eb?auto=format&fit=crop&w=1200&q=80',
+      image: '/heritage-images/toda.jpg',
       experienceLabel: 'Counted-Thread Motif Explorer',
       sourceNote: 'Geographical Indications Registry No. 135 & Ministry of Textiles'
-    },
-    {
-      slug: 'thathera',
-      title: 'THATHERA METAL CRAFT',
-      region: 'NORTH INDIA • PUNJAB',
-      invitation: 'Journey through the 8 traditional stages of hand-hammered brass and copper utensil making in Jandiala Guru.',
-      qrUrl: '/qr-assets/thathera.png',
-      route: '/scan/thathera',
-      image: 'https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=1200&q=80',
-      experienceLabel: '8-Stage Craft Journey',
-      sourceNote: 'UNESCO Representative List File 00845 & Sangeet Natak Akademi'
     },
     {
       slug: 'chhau',
@@ -46,9 +35,20 @@ export const PostersPage: React.FC = () => {
       invitation: 'Discover the martial footwork, dramatic masks, and three regional styles of Seraikella, Purulia, and Mayurbhanj.',
       qrUrl: '/qr-assets/chhau.png',
       route: '/scan/chhau',
-      image: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
+      image: '/heritage-images/chhau.jpg',
       experienceLabel: '3-Style Performance Explorer',
       sourceNote: 'UNESCO Representative List File 00337 & Sangeet Natak Akademi'
+    },
+    {
+      slug: 'warli',
+      title: 'WARLI PAINTING',
+      region: 'WEST INDIA • MAHARASHTRA',
+      invitation: 'Discover the sacred symbols, Tarpa dance spiral, and living stories behind this traditional Adivasi artwork.',
+      qrUrl: '/qr-assets/warli.png',
+      route: '/scan/warli',
+      image: '/heritage-images/warli.jpg',
+      experienceLabel: 'Flagship WebAR Experience',
+      sourceNote: 'INTACH Dahanu Chapter Cultural Mapping & GI Registry No. 342'
     }
   ];
 
@@ -115,6 +115,9 @@ export const PostersPage: React.FC = () => {
           <img
             src={currentPoster.image}
             alt={currentPoster.title}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = `/heritage-images/${currentPoster.slug}.jpg`;
+            }}
             className="w-full h-full object-cover"
           />
         </div>

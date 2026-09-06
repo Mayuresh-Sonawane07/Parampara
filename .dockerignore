@@ -1,0 +1,12 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+node_modules
+frontend/node_modules
+.pytest_cache
+dist
+frontend/dist
+.DS_Store
+Thumbs.db

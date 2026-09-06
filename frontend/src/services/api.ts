@@ -1,4 +1,4 @@
-﻿import {
+import {
   TraditionSummary,
   TraditionDetail,
   Experience,
@@ -7,10 +7,16 @@
   Contribution,
   ContributionCreate,
   Source,
-  AdminStats
+  AdminStats,
+  AdminTradition,
+  TraditionCreateInput,
+  TraditionUpdateInput,
+  SourceCreateInput,
+  SourceUpdateInput,
+  AdminAuditData
 } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '') + '/api';
 
 export async function fetchTraditions(region?: string, category?: string): Promise<TraditionSummary[]> {
   const params = new URLSearchParams();
@@ -127,3 +133,127 @@ export async function fetchAdminStats(token: string): Promise<AdminStats> {
   if (!res.ok) throw new Error(`Failed to fetch admin stats`);
   return res.json();
 }
+
+export async function deleteAdminContribution(token: string, id: number): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/admin/contributions/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to delete contribution`);
+  return res.json();
+}
+
+export async function fetchAdminTraditions(token: string): Promise<AdminTradition[]> {
+  const res = await fetch(`${API_BASE}/admin/traditions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to fetch admin traditions`);
+  return res.json();
+}
+
+export async function createAdminTradition(token: string, data: TraditionCreateInput): Promise<AdminTradition> {
+  const res = await fetch(`${API_BASE}/admin/traditions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to create tradition' }));
+    throw new Error(err.detail || 'Failed to create tradition');
+  }
+  return res.json();
+}
+
+export async function updateAdminTradition(
+  token: string,
+  id: number,
+  data: TraditionUpdateInput
+): Promise<AdminTradition> {
+  const res = await fetch(`${API_BASE}/admin/traditions/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to update tradition' }));
+    throw new Error(err.detail || 'Failed to update tradition');
+  }
+  return res.json();
+}
+
+export async function deleteAdminTradition(token: string, id: number): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/admin/traditions/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to delete tradition`);
+  return res.json();
+}
+
+export async function fetchAdminSources(token: string): Promise<Source[]> {
+  const res = await fetch(`${API_BASE}/admin/sources`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to fetch admin sources`);
+  return res.json();
+}
+
+export async function createAdminSource(token: string, data: SourceCreateInput): Promise<Source> {
+  const res = await fetch(`${API_BASE}/admin/sources`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to add source' }));
+    throw new Error(err.detail || 'Failed to add source');
+  }
+  return res.json();
+}
+
+export async function updateAdminSource(
+  token: string,
+  id: number,
+  data: SourceUpdateInput
+): Promise<Source> {
+  const res = await fetch(`${API_BASE}/admin/sources/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to update source' }));
+    throw new Error(err.detail || 'Failed to update source');
+  }
+  return res.json();
+}
+
+export async function deleteAdminSource(token: string, id: number): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/admin/sources/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to delete source citation`);
+  return res.json();
+}
+
+export async function fetchAdminAudit(token: string): Promise<AdminAuditData> {
+  const res = await fetch(`${API_BASE}/admin/audit`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to fetch system audit report`);
+  return res.json();
+}
+

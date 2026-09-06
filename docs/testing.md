@@ -15,10 +15,16 @@ $env:PYTHONPATH = "backend"
 ### Covered Test Specifications:
 - `test_health`: Validates `/api/health` system status and version.
 - `test_get_traditions`: Asserts exactly four verified regional traditions are returned.
-- `test_tradition_detail_and_sources`: Verifies grounded sources and AR hotspot count.
+- `test_tradition_detail_and_sources`: Verifies grounded sources and all 6 Warli AR hotspots.
 - `test_thathera_craft_journey_experience`: Verifies all 8 sequential metalcraft stages.
 - `test_quiz_retrieval_and_submission`: Tests question retrieval and automated scoring with source citation.
 - `test_community_contribution_lifecycle`: Validates submission -> PENDING status -> admin authentication -> approval -> updated statistics.
+
+### Run Comprehensive Endpoint Audit Script:
+```bash
+python scripts/audit_endpoints.py
+```
+Audits all 14 endpoint suites across both backend (`http://127.0.0.1:8000`) and Vite proxy (`http://localhost:5173`).
 
 ---
 

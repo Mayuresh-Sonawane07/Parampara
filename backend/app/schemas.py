@@ -192,3 +192,69 @@ class AdminStatsResponse(BaseModel):
     approved_contributions: int
     rejected_contributions: int
     total_sources: int
+
+class SourceCreate(BaseModel):
+    title: str
+    organization: str
+    author: Optional[str] = None
+    source_type: str = "UNESCO"
+    url: str
+    description: Optional[str] = None
+    verification_status: str = "VERIFIED"
+
+class SourceUpdate(BaseModel):
+    title: Optional[str] = None
+    organization: Optional[str] = None
+    author: Optional[str] = None
+    source_type: Optional[str] = None
+    url: Optional[str] = None
+    description: Optional[str] = None
+    verification_status: Optional[str] = None
+
+class TraditionCreate(BaseModel):
+    name: str
+    slug: str
+    region: str
+    state: str
+    community: Optional[str] = None
+    category: str
+    short_description: str
+    description: str
+    historical_context: Optional[str] = None
+    cultural_significance: Optional[str] = None
+    preservation_context: Optional[str] = None
+    experience_type: str = "CRAFT_JOURNEY"
+    hero_image: str = "/heritage-images/thathera.jpg"
+    thumbnail: str = "/heritage-images/thathera.jpg"
+    status: str = "PUBLISHED"
+
+class TraditionUpdate(BaseModel):
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    region: Optional[str] = None
+    state: Optional[str] = None
+    community: Optional[str] = None
+    category: Optional[str] = None
+    short_description: Optional[str] = None
+    description: Optional[str] = None
+    historical_context: Optional[str] = None
+    cultural_significance: Optional[str] = None
+    preservation_context: Optional[str] = None
+    experience_type: Optional[str] = None
+    hero_image: Optional[str] = None
+    thumbnail: Optional[str] = None
+    status: Optional[str] = None
+
+class AdminTraditionItem(TraditionSummary):
+    model_config = ConfigDict(from_attributes=True)
+    hotspots_count: int = 0
+    quiz_count: int = 0
+    contributions_count: int = 0
+    sources_count: int = 0
+
+class AdminAuditReport(BaseModel):
+    database_status: str
+    server_timestamp: datetime
+    metrics: dict
+    narration_voice_engines: dict
+    heritage_assets_verified: List[str]

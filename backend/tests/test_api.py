@@ -37,7 +37,7 @@ async def test_tradition_detail_and_sources():
     assert len(data["sources"]) >= 2
     assert any("INTACH" in s["organization"] for s in data["sources"])
     assert data["ar_experience"] is not None
-    assert len(data["ar_experience"]["hotspots"]) == 4
+    assert len(data["ar_experience"]["hotspots"]) == 6
 
 @pytest.mark.asyncio
 async def test_thathera_craft_journey_experience():

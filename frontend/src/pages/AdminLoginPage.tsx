@@ -19,6 +19,7 @@ export const AdminLoginPage: React.FC = () => {
       const data = await adminLogin(username, password);
       localStorage.setItem('parampara_admin_token', data.access_token);
       localStorage.setItem('parampara_admin_user', username);
+      window.dispatchEvent(new Event('auth_change'));
       navigate('/admin');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check credentials.');
@@ -89,8 +90,13 @@ export const AdminLoginPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="pt-2 text-center text-xs text-slate-400 border-t border-slate-100">
-          Administrator portal requires authenticated credentials. Set or reset via backend CLI utility: <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-600 font-mono">python -m app.create_admin</code>
+        <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100 space-y-1">
+          <div>
+            Default Admin: <code className="bg-amber-100 text-amber-950 font-bold px-1.5 py-0.5 rounded font-mono">admin</code> &nbsp;|&nbsp; Password: <code className="bg-amber-100 text-amber-950 font-bold px-1.5 py-0.5 rounded font-mono">ParamparaAdmin@2026</code>
+          </div>
+          <p className="text-[11px] text-slate-400">
+            Reset or manage via backend CLI utility: <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-600 font-mono">python -m app.create_admin</code>
+          </p>
         </div>
       </div>
     </div>

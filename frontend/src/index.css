@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -37,4 +37,14 @@
 
 .terracotta-glow {
   box-shadow: 0 0 25px rgba(154, 52, 18, 0.25);
+}
+
+@keyframes scan-laser {
+  0% { top: 4%; opacity: 0.3; }
+  50% { top: 94%; opacity: 0.95; }
+  100% { top: 4%; opacity: 0.3; }
+}
+
+.animate-scan-laser {
+  animation: scan-laser 2.8s ease-in-out infinite;
 }

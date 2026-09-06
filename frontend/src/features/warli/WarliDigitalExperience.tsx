@@ -1,8 +1,9 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Volume2, VolumeX, X, BookOpen, ChevronRight, ExternalLink, Camera } from 'lucide-react';
 import { ARExperience, ARHotspot } from '../../types';
 import { SourceBadge } from '../../components/SourceBadge';
+import { NarrationPlayer } from '../../components/NarrationPlayer';
 
 interface WarliDigitalExperienceProps {
   arExperience: ARExperience;
@@ -208,40 +209,13 @@ export const WarliDigitalExperience: React.FC<WarliDigitalExperienceProps> = ({
                 </div>
               )}
 
-              {/* Audio Narration Feature */}
-              <div className="pt-1 flex items-center justify-between bg-orange-50/70 p-3 rounded-xl border border-orange-200/80">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-[#9A3412] block">
-                    Audio Narration
-                  </span>
-                  <span className="text-[11px] text-slate-600">
-                    Listen to verified cultural meaning via browser speech
-                  </span>
-                </div>
-
-                <button
-                  onClick={() =>
-                    handleToggleNarration(
-                      `${selectedHotspot.name}. ${selectedHotspot.content}. ${selectedHotspot.cultural_context || ''}`
-                    )
-                  }
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    isPlayingAudio
-                      ? 'bg-red-600 text-white hover:bg-red-700'
-                      : 'bg-[#9A3412] text-white hover:bg-[#7C2D12]'
-                  }`}
-                >
-                  {isPlayingAudio ? (
-                    <>
-                      <VolumeX className="w-3.5 h-3.5" /> Stop Narration
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-3.5 h-3.5" /> Listen Audio
-                    </>
-                  )}
-                </button>
-              </div>
+              {/* Multi-language Spoken Narration (English, Hindi, Marathi) */}
+              <NarrationPlayer
+                traditionSlug="warli"
+                motifTitle={selectedHotspot.name}
+                motifContent={selectedHotspot.content}
+                culturalContext={selectedHotspot.cultural_context}
+              />
 
               {/* Source verification */}
               {selectedHotspot.source && (

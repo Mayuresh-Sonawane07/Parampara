@@ -1,8 +1,9 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Music, Sparkles, ChevronRight, Award, Theater, Flame, Compass } from 'lucide-react';
 import { Experience, ExperienceItem } from '../../types';
 import { SourceBadge } from '../../components/SourceBadge';
+import { NarrationPlayer } from '../../components/NarrationPlayer';
 
 interface PerformanceExplorerProps {
   experience: Experience;
@@ -149,6 +150,17 @@ export const PerformanceExplorer: React.FC<PerformanceExplorerProps> = ({ experi
                     <strong>Materials / Props:</strong> {item.tool_or_material}
                   </div>
                 )}
+
+                {/* Regional Spoken Audio Narration (English, Hindi, Bengali) */}
+                <div className="pt-2">
+                  <NarrationPlayer
+                    traditionSlug="chhau"
+                    motifTitle={item.title}
+                    motifContent={item.description}
+                    culturalContext={item.cultural_context}
+                    compact
+                  />
+                </div>
               </div>
 
               {item.source && (

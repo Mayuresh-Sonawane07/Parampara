@@ -1,8 +1,9 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Flame, Hammer, Wrench, Shield, CheckCircle2, ChevronRight, ChevronLeft, Sparkles, BookOpen } from 'lucide-react';
 import { Experience, ExperienceItem } from '../../types';
 import { SourceBadge } from '../../components/SourceBadge';
+import { NarrationPlayer } from '../../components/NarrationPlayer';
 
 interface CraftJourneyProps {
   experience: Experience;
@@ -158,6 +159,14 @@ export const CraftJourney: React.FC<CraftJourneyProps> = ({ experience }) => {
                 </p>
               </div>
             )}
+
+            {/* Regional Spoken Audio Narration (English, Hindi, Punjabi) */}
+            <NarrationPlayer
+              traditionSlug="thathera"
+              motifTitle={activeItem.title}
+              motifContent={activeItem.description}
+              culturalContext={activeItem.cultural_context}
+            />
 
             {/* Source Verification Badge */}
             {activeItem.source && (

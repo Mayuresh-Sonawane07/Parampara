@@ -1,8 +1,9 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ZoomIn, ZoomOut, RotateCcw, Info, Sparkles, ChevronRight, Layers, BookOpen } from 'lucide-react';
 import { Experience, ExperienceItem } from '../../types';
 import { SourceBadge } from '../../components/SourceBadge';
+import { NarrationPlayer } from '../../components/NarrationPlayer';
 
 interface MotifExplorerProps {
   experience: Experience;
@@ -248,6 +249,14 @@ export const MotifExplorer: React.FC<MotifExplorerProps> = ({ experience }) => {
                     </p>
                   </div>
                 )}
+
+                {/* Regional Spoken Audio Narration (English, Hindi, Tamil) */}
+                <NarrationPlayer
+                  traditionSlug="toda"
+                  motifTitle={currentMotifItem.title}
+                  motifContent={currentMotifItem.description}
+                  culturalContext={currentMotifItem.cultural_context}
+                />
 
                 {currentMotifItem.source && (
                   <div className="pt-2">

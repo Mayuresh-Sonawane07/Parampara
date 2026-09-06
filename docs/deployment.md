@@ -1,79 +1,135 @@
-# ₹0 Free-Tier Production Deployment Guide
+# PARAMPARA AR LITE: Free Cloud Deployment Guide
 
-Project: **PARAMPARA AR LITE**
-National Digital Heritage Platform
-
-The entire application is engineered to deploy seamlessly on 100% free-tier services without introducing paid dependencies or trial credit expiration risks.
+This guide provides step-by-step instructions to deploy the entire **PARAMPARA AR LITE** living heritage platform **100% free forever** with SSL/HTTPS, automated Git deployments, and zero cloud hosting costs.
 
 ---
 
-## 1. Free-Tier Stack Architecture
+## Architecture Summary
 
-| Component | Recommended Free Provider | Free Tier Limits | Cost |
-|---|---|---|---|
-| **Database** | **Neon Free** or **Supabase Free** | 500 MB PostgreSQL, SSL enabled | ₹0 |
-| **Backend API** | **Render Free Web Service** | 512 MB RAM, free HTTPS domain | ₹0 |
-| **Frontend UI** | **Vercel Hobby** or **Render Static** | Unlimited bandwidth for demo traffic | ₹0 |
-| **Media Assets** | **Local static serving** or **Cloudinary Free** | Free 25 GB monthly bandwidth | ₹0 |
-| **WebAR Engine** | **AR.js & Client Browser** | Runs 100% on user device | ₹0 |
-
----
-
-## 2. Step 1: Deploy Database (Neon Free or Supabase)
-
-1. Create a free account on [neon.tech](https://neon.tech) or [supabase.com](https://supabase.com).
-2. Create a new project called `parampara-db`.
-3. Copy the PostgreSQL connection string. Format:
-   ```
-   postgresql://user:password@ep-xyz.region.aws.neon.tech/parampara?sslmode=require
-   ```
+| Component | Technology | Recommended Free Host | Free Tier Highlights |
+| :--- | :--- | :--- | :--- |
+| **Frontend** | React 19 + Vite + TypeScript | **Vercel** / **Netlify** | Global Edge CDN, automated preview builds, free SSL, 100 GB bandwidth/mo |
+| **Backend API** | FastAPI + Python 3.11 + Uvicorn | **Render.com** / **Koyeb** | 750 free compute hours/mo, free SSL, native Python runtime |
+| **Database** | SQLite / PostgreSQL | **Built-in SQLite** or **Neon / Supabase** | Free serverless PostgreSQL (0.5 GB free storage) |
+| **TTS Narration**| gTTS / Regional Audio Proxy | Included in Backend | In-memory & audio buffer streaming for English, Hindi, Marathi |
 
 ---
 
-## 3. Step 2: Deploy Backend to Render
+## Method A: The Recommended Setup (Vercel + Render in 5 Minutes)
 
-1. Create a free account on [render.com](https://render.com).
-2. Click **New** -> **Web Service** -> Connect your GitHub repository.
-3. Configure settings:
-   - **Root Directory**: Leave blank (or `backend`)
-   - **Environment**: Python 3
+This is the standard modern web architecture: your Vite Single Page App is served by Vercel's global CDN, and dynamic API requests route to your FastAPI backend on Render.
+
+### Step 1: Push Your Code to GitHub
+Ensure all your project files are committed to a GitHub repository:
+```bash
+git add .
+git commit -m "feat: complete living heritage platform with 30 motifs and admin console"
+git push origin main
+```
+
+---
+
+### Step 2: Deploy Backend to Render.com (Free)
+
+1. Sign up or log in at **[render.com](https://render.com)** (you can sign in with GitHub).
+2. Click **New +** → **Web Service**.
+3. Select **Build and deploy from a Git repository** and pick your `PARAMPARA` repository.
+4. Fill in the service configuration:
+   - **Name**: `parampara-api` (or any name you like)
+   - **Region**: Choose the closest region (e.g. `Singapore` or `Frankfurt` or `Oregon`)
+   - **Branch**: `main`
+   - **Root Directory**: *(Leave empty)*
+   - **Runtime**: `Python 3`
    - **Build Command**:
      ```bash
-     pip install -r backend/requirements.txt && export PYTHONPATH=backend && python -m app.seed && python -m app.qr_generator
+     pip install -r backend/requirements.txt
      ```
    - **Start Command**:
      ```bash
-     export PYTHONPATH=backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+     uvicorn app.main:app --host 0.0.0.0 --port $PORT --app-dir backend
      ```
-4. Add Environment Variables:
-   - `DATABASE_URL`: `[Your Neon/Supabase PostgreSQL connection string]`
-   - `JWT_SECRET`: `[Generate a secure 32+ character random key]`
-   - `FRONTEND_URL`: `https://parampara-ar-lite.vercel.app`
-   - `ADMIN_DEFAULT_PASSWORD`: `ParamparaAdmin@2026`
-5. Click **Deploy**. Note down the assigned URL: `https://parampara-backend.onrender.com`.
-
----
-
-## 4. Step 3: Deploy Frontend to Vercel
-
-1. Create a free account on [vercel.com](https://vercel.com).
-2. Click **Add New Project** -> Import repository.
-3. Configure Project Settings:
-   - **Framework Preset**: Vite
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Add Environment Variables:
-   - `VITE_API_URL`: `https://parampara-backend.onrender.com/api`
-5. Click **Deploy**.
-
----
-
-## 5. Step 4: Regenerate Production QR Codes
-
-Once your production frontend URL is live (e.g. `https://parampara.vercel.app`):
-1. Run the QR generator with your production URL:
-   ```bash
-   python -c "from app.qr_generator import generate_qr_codes; generate_qr_codes('https://parampara.vercel.app')"
+   - **Instance Type**: **Free** ($0/month)
+5. Under **Advanced** → **Add Environment Variable**:
+   - `PYTHON_VERSION` = `3.11.9`
+   - `JWT_SECRET` = *(Click "Generate" or type a secure random string)*
+   - `FRONTEND_URL` = `*`
+6. Click **Create Web Service**.
+7. Render will build and launch your backend. Once deployed, note down your backend URL (e.g. `https://parampara-api.onrender.com`).
+8. Verify it by visiting `https://parampara-api.onrender.com/api/health` in your browser. You should see:
+   ```json
+   { "status": "healthy", "heritage_data_authenticity": "VERIFIED_ZERO_FABRICATION" }
    ```
-2. The generated posters will now directly navigate mobile scanners to your live production HTTPS experiences.
+   *(Note: The database automatically self-seeds all 4 living traditions, 30 Warli motifs, UNESCO citations, and the default admin user on first launch!)*
+
+---
+
+### Step 3: Deploy Frontend to Vercel (Free)
+
+1. Sign up or log in at **[vercel.com](https://vercel.com)** using your GitHub account.
+2. Click **Add New…** → **Project**.
+3. Import your `PARAMPARA` repository.
+4. Configure the project:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: Click **Edit** and select **`frontend`**.
+   - **Build Command**: `npm run build` *(detected automatically)*
+   - **Output Directory**: `dist` *(detected automatically)*
+5. Open the **Environment Variables** section and add:
+   - **Key**: `VITE_API_URL`
+   - **Value**: `https://parampara-api.onrender.com` *(use your actual Render backend URL from Step 2 without a trailing slash)*
+6. Click **Deploy**.
+7. In ~40 seconds, Vercel will finish building. Click on your assigned domain (e.g. `https://parampara.vercel.app`).
+
+> [!TIP]
+> The included [`frontend/vercel.json`](file:///c:/Users/Mayuresh/PARAMPARA/frontend/vercel.json) and [`frontend/public/_redirects`](file:///c:/Users/Mayuresh/PARAMPARA/frontend/public/_redirects) automatically configure Single Page Application rewrites so page refreshes on deep routes like `/tradition/warli/ar` or `/admin` will never trigger a 404!
+
+---
+
+## Method B: All-In-One Monolithic Deployment (Single URL)
+
+If you prefer having **one single domain** for both the frontend and the backend (e.g., `https://parampara.onrender.com`), you can deploy using the included multi-stage [`Dockerfile`](file:///c:/Users/Mayuresh/PARAMPARA/Dockerfile).
+
+### Where to host for free:
+1. **Koyeb** ([koyeb.com](https://www.koyeb.com)):
+   - Offers a **Free Nano instance** (512MB RAM, continuous deployment).
+   - Click **Create App** → GitHub → Select repository.
+   - Choose **Dockerfile** as the builder.
+   - Koyeb will run the multi-stage Docker build, compile the Vite frontend, and serve everything via FastAPI on port `8000`.
+2. **Hugging Face Spaces** ([huggingface.co/spaces](https://huggingface.co)):
+   - 100% Free Docker space with **16 GB RAM and 2 vCPUs** that never spins down!
+   - Create a new Space → Select **Docker** SDK → Blank.
+   - Push this repository to your Space repository.
+3. **Render (Docker)**:
+   - When creating a Web Service on Render, select **Docker** as the environment. Render will build the container from `Dockerfile`.
+
+---
+
+## Free Database Options: SQLite vs. PostgreSQL
+
+### 1. Default: Self-Contained SQLite (`parampara.db`)
+- Zero configuration required.
+- Automatically created and pre-seeded on first launch.
+- Perfect for exhibitions, hackathons, and community presentations.
+
+### 2. Upgrade to Serverless PostgreSQL (100% Free)
+If you want persistent external cloud storage across container restarts:
+1. Create a free database at **[Neon.tech](https://neon.tech)** or **[Supabase.com](https://supabase.com)** (both offer free PostgreSQL with instant connection strings).
+2. Copy your connection URL (e.g. `postgresql://user:password@ep-xyz.neon.tech/parampara`).
+3. Add it as an environment variable in Render or Koyeb:
+   ```env
+   DATABASE_URL=postgresql://user:password@ep-xyz.neon.tech/parampara?sslmode=require
+   ```
+4. The backend [`config.py`](file:///c:/Users/Mayuresh/PARAMPARA/backend/app/config.py) automatically handles PostgreSQL driver syntax and seeds the tables on first startup!
+
+---
+
+## Post-Deployment Verification Checklist
+
+After deploying, verify these 5 core experiences:
+1. **Public Catalog**: Visit `/explore` — ensure all 4 traditions (Thathera, Toda, Chhau, Warli) load with verified images.
+2. **Poster Parity**: Visit `/posters` — verify images match the Explore catalog.
+3. **WebAR Scanner**: Visit `/tradition/warli/ar` — test live webcam scan or select one of the curated sample paintings to verify dynamic 30-motif pin recognition.
+4. **Multilingual Audio**: Click the speaker icon to test narration playback in **English**, **Hindi (हिन्दी)**, and **Marathi (मराठी)**.
+5. **Curatorial Admin Console**: Visit `/admin/login` and log in:
+   - **Username**: `admin`
+   - **Password**: `ParamparaAdmin@2026`
+   - Verify that the navigation bar transforms into the **Curatorial Admin Console** and allows managing submissions, traditions, sources, and running live system health diagnostics.

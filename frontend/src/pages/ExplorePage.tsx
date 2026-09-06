@@ -216,8 +216,11 @@ export const ExplorePage: React.FC = () => {
                 {/* Authentic Image */}
                 <div className="relative aspect-video sm:aspect-square overflow-hidden bg-slate-100">
                   <img
-                    src={t.thumbnail}
+                    src={t.thumbnail || `/heritage-images/${t.slug}.jpg`}
                     alt={t.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `/heritage-images/${t.slug}.jpg`;
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3">
