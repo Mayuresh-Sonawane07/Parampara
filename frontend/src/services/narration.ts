@@ -322,7 +322,8 @@ export function speakCulturalNarration({
     targetLang = 'en';
   }
 
-  const apiPrefix = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+  const rawEnv = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+  const apiPrefix = rawEnv.endsWith('/api') ? rawEnv.slice(0, -4) : rawEnv;
   const audioUrl = `${apiPrefix}/api/narration/audio?text=${encodeURIComponent(trimmedText)}&lang=${targetLang}`;
   const audio = new Audio(audioUrl);
   activeAudio = audio;

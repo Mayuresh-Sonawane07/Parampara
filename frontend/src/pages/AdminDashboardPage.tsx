@@ -105,6 +105,22 @@ export const AdminDashboardPage: React.FC = () => {
       return;
     }
     loadData();
+
+    // Auto-refresh when user refocuses tab or every 15s
+    const handleFocus = () => {
+      loadData();
+    };
+    window.addEventListener('focus', handleFocus);
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        loadData();
+      }
+    }, 15000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
   }, [token, activeTab, statusFilter]);
 
   const loadData = async () => {
@@ -453,17 +469,31 @@ export const AdminDashboardPage: React.FC = () => {
 
             {/* Filter Pills */}
             <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
-              {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((st) => (
+              {[
+                { key: 'ALL', label: 'ALL', count: (stats?.pending_contributions ?? 0) + (stats?.approved_contributions ?? 0) + (stats?.rejected_contributions ?? 0) },
+                { key: 'PENDING', label: 'PENDING', count: stats?.pending_contributions ?? 0 },
+                { key: 'APPROVED', label: 'APPROVED', count: stats?.approved_contributions ?? 0 },
+                { key: 'REJECTED', label: 'REJECTED', count: stats?.rejected_contributions ?? 0 },
+              ].map(({ key, label, count }) => (
                 <button
-                  key={st}
-                  onClick={() => setStatusFilter(st)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    statusFilter === st
+                  key={key}
+                  onClick={() => setStatusFilter(key)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    statusFilter === key
                       ? 'bg-white text-slate-900 shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  {st}
+                  <span>{label}</span>
+                  <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                    key === 'PENDING' && count > 0
+                      ? 'bg-amber-100 text-amber-800 font-extrabold'
+                      : statusFilter === key
+                      ? 'bg-slate-100 text-slate-700'
+                      : 'bg-slate-200/70 text-slate-500'
+                  }`}>
+                    {count}
+                  </span>
                 </button>
               ))}
               <button
@@ -476,14 +506,51 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Pending Alert Banner when user is viewing Approved queue */}
+          {statusFilter === 'APPROVED' && (stats?.pending_contributions ?? 0) > 0 && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3 text-xs flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                <span><strong>{stats?.pending_contributions} submission(s)</strong> currently awaiting curatorial review in the Pending queue.</span>
+              </div>
+              <button
+                onClick={() => setStatusFilter('PENDING')}
+                className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition-colors text-[11px]"
+              >
+                View Pending Submissions →
+              </button>
+            </div>
+          )}
+
           {loading ? (
             <div className="text-center py-16">
               <div className="animate-spin w-8 h-8 border-4 border-[#9A3412] border-t-transparent rounded-full mx-auto mb-2"></div>
               <p className="text-xs text-slate-500">Loading submissions from database...</p>
             </div>
           ) : contributions.length === 0 ? (
-            <div className="text-center py-12 text-slate-500 text-xs">
-              No contributions found in this status queue.
+            <div className="text-center py-12 text-slate-500 text-xs space-y-2">
+              <p className="font-semibold text-slate-700">
+                {statusFilter === 'PENDING'
+                  ? 'No pending submissions in the review queue.'
+                  : statusFilter === 'APPROVED'
+                  ? 'No approved contributions currently published.'
+                  : statusFilter === 'REJECTED'
+                  ? 'No rejected contributions.'
+                  : 'No community contributions found in the database.'}
+              </p>
+              <p className="text-slate-400">
+                {statusFilter === 'APPROVED' && (stats?.pending_contributions ?? 0) > 0
+                  ? `There are ${stats?.pending_contributions} submission(s) waiting in the Pending tab.`
+                  : 'Contributions submitted on the public /contribute page will appear here.'}
+              </p>
+              {statusFilter !== 'ALL' && (
+                <button
+                  onClick={() => setStatusFilter('ALL')}
+                  className="mt-2 px-3 py-1.5 text-[11px] font-bold text-[#9A3412] hover:bg-orange-50 rounded-lg transition-colors border border-orange-200"
+                >
+                  Show All Submissions
+                </button>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">

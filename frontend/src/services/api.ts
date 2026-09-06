@@ -16,7 +16,12 @@ import {
   AdminAuditData
 } from '../types';
 
-const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '') + '/api';
+const envUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+export const API_BASE = !envUrl
+  ? '/api'
+  : envUrl === '/api' || envUrl.endsWith('/api')
+  ? envUrl
+  : `${envUrl}/api`;
 
 export async function fetchTraditions(region?: string, category?: string): Promise<TraditionSummary[]> {
   const params = new URLSearchParams();

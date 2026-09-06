@@ -39,8 +39,8 @@ def list_contributions(
     db: Session = Depends(get_db)
 ):
     query = db.query(models.Contribution)
-    if status_filter:
-        query = query.filter(models.Contribution.status == status_filter.upper())
+    if status_filter and status_filter.strip().upper() != "ALL":
+        query = query.filter(models.Contribution.status == status_filter.strip().upper())
     return query.order_by(models.Contribution.created_at.desc()).offset(skip).limit(limit).all()
 
 @router.patch("/contributions/{contribution_id}", response_model=schemas.ContributionResponse)
