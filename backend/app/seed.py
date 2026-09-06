@@ -4,6 +4,21 @@ from app.database import SessionLocal, engine, Base
 from app import models, auth
 from app.config import settings
 
+def ensure_admin_account(db: Session):
+    admin_user = db.query(models.User).filter(models.User.username == 'admin').first()
+    if not admin_user:
+        import os
+        admin_pass = os.getenv('ADMIN_PASSWORD') or os.getenv('ADMIN_DEFAULT_PASSWORD') or 'ParamparaAdmin@2026'
+        admin_user = models.User(
+            username='admin',
+            email='admin@parampara.heritage',
+            hashed_password=auth.get_password_hash(admin_pass),
+            is_admin=True
+        )
+        db.add(admin_user)
+        db.commit()
+        print("Admin account initialized (username: 'admin').")
+
 def seed_database():
     Base.metadata.create_all(bind=engine)
     db: Session = SessionLocal()
@@ -11,7 +26,8 @@ def seed_database():
     try:
         print('Checking if database is already seeded...')
         if db.query(models.Tradition).count() > 0:
-            print('Database already contains traditions. Skipping duplicate seeding.')
+            print('Database already contains traditions. Ensuring admin user exists...')
+            ensure_admin_account(db)
             return
 
         print('Seeding verified research sources...')
@@ -629,22 +645,7 @@ def seed_database():
         db.commit()
 
         # Admin User initialization
-        import os
-        admin_pass = os.getenv('ADMIN_PASSWORD') or os.getenv('ADMIN_DEFAULT_PASSWORD')
-        if admin_pass:
-            admin_user = models.User(
-                username='admin',
-                email='admin@parampara.heritage',
-                hashed_password=auth.get_password_hash(admin_pass),
-                is_admin=True
-            )
-            db.add(admin_user)
-            db.commit()
-            print("Admin account initialized (username: 'admin').")
-        else:
-            print("\n[SECURITY NOTICE] No ADMIN_PASSWORD provided in environment.")
-            print("To create or configure your first administrator, run:")
-            print("   python -m app.create_admin --username admin --email admin@parampara.heritage\n")
+        ensure_admin_account(db)
 
         print("Database seeded successfully with 4 verified traditions, 8 archival sources, 4 quizzes, and AR target configuration!")
     except Exception as e:
