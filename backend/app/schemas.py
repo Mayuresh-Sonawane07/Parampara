@@ -1,6 +1,12 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict
+
+try:
+    import email_validator
+    from pydantic import EmailStr
+except ImportError:
+    EmailStr = str
 
 # ----------------- Source Schemas -----------------
 class SourceBase(BaseModel):
