@@ -52,7 +52,7 @@ export const PostersPage: React.FC = () => {
     },
     {
       slug: 'warli',
-      title: 'WARLI PAINTING',
+      title: 'WARLI SACRED ART',
       region: 'WEST INDIA • MAHARASHTRA',
       invitation: 'Discover the sacred symbols, Tarpa dance spiral, and living stories behind this traditional Adivasi artwork.',
       qrUrl: '/qr-assets/warli.png',
@@ -76,10 +76,10 @@ export const PostersPage: React.FC = () => {
       width: 480,
       margin: 2,
       color: {
-        dark: '#1E1E24', // Obsidian ink
-        light: '#FAF7F2' // Archival parchment white
+        dark: '#1E1E24',
+        light: '#FAF7F2'
       },
-      errorCorrectionLevel: 'H' // High resilience for physical phone scanning
+      errorCorrectionLevel: 'H'
     }).then((dataUrl) => {
       if (isMounted) {
         setQrDataUrls(prev => ({ ...prev, [currentSlug]: dataUrl }));
@@ -114,37 +114,37 @@ export const PostersPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Title & Overview */}
       <div className="border-b border-[#E6D5C3] pb-6 space-y-2 print:hidden">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#9A3412]">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#9A3412] font-cinzel">
           <QrCode className="w-4 h-4" />
           Physical-to-Digital Heritage Bridge
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-slate-900">
+        <h1 className="font-cinzel text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           Printable Physical Heritage Posters
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 max-w-3xl leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-600 max-w-3xl leading-relaxed font-sans">
           Each poster connects exhibition visitors to the living tradition experience through a verified, dynamic QR code. Print or display these posters in cultural centres, museum galleries, and hackathons.
         </p>
       </div>
 
       {/* Target Domain Bar / Exhibition Controls */}
-      <div className="bg-[#FFFBF5] border border-[#E6D5C3] rounded-2xl p-4 sm:p-5 print:hidden shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-card rounded-3xl p-5 print:hidden shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
               Live Dynamic QR
             </span>
-            <span className="text-xs font-semibold text-slate-500">
+            <span className="text-xs font-semibold text-slate-600 font-sans">
               Scanning phone opens:
             </span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <code className="text-xs font-mono font-bold text-[#9A3412] bg-orange-100/60 px-2.5 py-1 rounded-md border border-orange-200">
+            <code className="text-xs font-mono font-bold text-[#9A3412] bg-orange-100/70 px-3 py-1 rounded-xl border border-orange-200">
               {activeFullTargetUrl}
             </code>
             <button
               onClick={copyScanUrl}
-              className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-[#9A3412] transition-colors"
+              className="inline-flex items-center gap-1 text-xs font-bold text-slate-600 hover:text-[#9A3412] transition-colors cursor-pointer"
               title="Copy Target URL"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -162,11 +162,11 @@ export const PostersPage: React.FC = () => {
                 value={baseUrl}
                 onChange={(e) => setBaseUrl(e.target.value)}
                 placeholder="https://parampara-api-oocd.onrender.com"
-                className="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9A3412] w-64 font-mono"
+                className="px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#9A3412] w-64 font-mono shadow-xs"
               />
               <button
                 onClick={() => setIsEditingUrl(false)}
-                className="px-3 py-1.5 bg-[#9A3412] text-white text-xs font-bold rounded-lg hover:bg-[#7C2D12]"
+                className="px-4 py-2 bg-[#9A3412] text-white text-xs font-bold rounded-xl hover:bg-[#7C2D12] cursor-pointer"
               >
                 Apply
               </button>
@@ -174,7 +174,7 @@ export const PostersPage: React.FC = () => {
           ) : (
             <button
               onClick={() => setIsEditingUrl(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-all shadow-xs cursor-pointer"
             >
               <Globe className="w-3.5 h-3.5 text-slate-500" />
               Change Target Domain
@@ -188,7 +188,7 @@ export const PostersPage: React.FC = () => {
                 setIsEditingUrl(false);
               }}
               title="Reset to default deployment domain"
-              className="p-1.5 text-slate-500 hover:text-slate-800 bg-white border border-slate-200 rounded-lg"
+              className="p-2 text-slate-500 hover:text-slate-800 bg-white border border-slate-200 rounded-xl shadow-xs cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
@@ -202,7 +202,7 @@ export const PostersPage: React.FC = () => {
           <button
             key={p.slug}
             onClick={() => setActivePosterIndex(idx)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activePosterIndex === idx
                 ? 'bg-[#9A3412] text-white shadow-md'
                 : 'bg-white text-slate-700 hover:bg-orange-50 border border-slate-200'
@@ -215,14 +215,14 @@ export const PostersPage: React.FC = () => {
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={downloadQr}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 transition-colors shadow-xs"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 transition-all shadow-xs cursor-pointer"
             title="Download QR code image for this poster"
           >
             <Download className="w-4 h-4 text-[#9A3412]" /> Download QR PNG
           </button>
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-all shadow-md cursor-pointer"
           >
             <Printer className="w-4 h-4" /> Print Current Poster
           </button>
@@ -232,21 +232,21 @@ export const PostersPage: React.FC = () => {
       {/* THE PRINTABLE POSTER CARD (A4 Aspect Ratio Ready) */}
       <div className="max-w-2xl mx-auto bg-white border-4 border-[#7C2D12] rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8 print:border-2 print:p-6 print:shadow-none print:max-w-none">
         {/* Top Header */}
-        <div className="text-center space-y-2 border-b-2 border-[#E6D5C3] pb-6">
-          <div className="flex items-center justify-center gap-2 text-xs font-bold tracking-widest uppercase text-[#9A3412]">
-            <Sparkles className="w-4 h-4 text-amber-600" />
-            PARAMPARA AR LITE • {currentPoster.region}
+        <div className="text-center space-y-2.5 border-b-2 border-[#E6D5C3] pb-6">
+          <div className="flex items-center justify-center gap-2 text-xs font-black tracking-widest uppercase text-[#9A3412] font-cinzel">
+            <span className="text-base">🪷</span>
+            <span>PARAMPARA AR LITE • {currentPoster.region}</span>
           </div>
-          <h2 className="font-serif text-3xl sm:text-4xl font-black tracking-wider text-slate-900 uppercase">
+          <h2 className="font-cinzel text-3xl sm:text-4xl font-black tracking-wider text-slate-900 uppercase">
             {currentPoster.title}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed font-sans">
             "{currentPoster.invitation}"
           </p>
         </div>
 
         {/* Poster Visual Image */}
-        <div className="aspect-[4/3] rounded-2xl overflow-hidden border-2 border-[#E6D5C3] shadow-inner bg-slate-100">
+        <div className="aspect-4/3 rounded-2xl overflow-hidden border-2 border-[#E6D5C3] shadow-inner bg-slate-100">
           <img
             src={currentPoster.image}
             alt={currentPoster.title}
@@ -263,10 +263,10 @@ export const PostersPage: React.FC = () => {
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#9A3412] bg-orange-100/80 px-2.5 py-1 rounded-md">
               {currentPoster.experienceLabel}
             </span>
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
+            <h3 className="font-cinzel text-xl sm:text-2xl font-bold text-slate-900">
               SCAN TO EXPLORE
             </h3>
-            <p className="text-xs text-slate-500 max-w-xs">
+            <p className="text-xs text-slate-500 max-w-xs font-sans">
               Open your smartphone camera or QR scanner to launch the interactive digital experience.
             </p>
             <div className="pt-1">
@@ -283,23 +283,25 @@ export const PostersPage: React.FC = () => {
           </div>
 
           {/* Clean High-Contrast Single Dynamic QR */}
-          <div className="flex-shrink-0 bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex flex-col items-center">
+          <div className="flex-shrink-0 bg-white p-3.5 rounded-2xl border-2 border-slate-900 shadow-md flex flex-col items-center">
             <img
               src={activeQrImage}
               alt={`Dynamic QR Code for ${currentPoster.title}`}
               className="w-36 h-36 object-contain"
             />
-            <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 mt-1">
+            <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-500 mt-1">
               Verified Heritage QR
             </span>
           </div>
         </div>
 
         {/* Verified Ground Truth Footer */}
-        <div className="text-center pt-2 border-t border-slate-100 text-[11px] text-slate-600 font-medium">
+        <div className="text-center pt-2 border-t border-slate-100 text-[11px] text-slate-600 font-medium font-sans">
           Source Ground Truth: {currentPoster.sourceNote}
         </div>
       </div>
     </div>
   );
 };
+
+export default PostersPage;

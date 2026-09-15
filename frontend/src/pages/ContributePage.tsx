@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Send, ShieldCheck, CheckCircle2, AlertCircle, FileText, Sparkles } from 'lucide-react';
+import { Send, ShieldCheck, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { submitContribution } from '../services/api';
 import { ContributionCreate, Contribution } from '../types';
 
@@ -61,43 +61,43 @@ export const ContributePage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       {/* Header */}
       <div className="border-b border-[#E6D5C3] pb-6 space-y-2">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#9A3412]">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#9A3412] font-cinzel">
           <Send className="w-4 h-4" />
           Community Knowledge Archiving
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-slate-900">
+        <h1 className="font-cinzel text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           Contribute Cultural Heritage Knowledge
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl">
+        <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl font-sans">
           Help preserve India's living cultural traditions. Community submissions undergo editorial verification against institutional records before publication as authentic Community Voice.
         </p>
       </div>
 
       {/* Ethical Protocol Notice */}
-      <div className="bg-amber-50/80 border border-amber-300/80 rounded-2xl p-5 space-y-2 text-xs text-amber-950">
-        <div className="flex items-center gap-2 font-bold text-amber-900 text-sm">
-          <ShieldCheck className="w-4 h-4 text-amber-700" />
+      <div className="glass-card rounded-3xl p-6 space-y-2 text-xs text-amber-950 border border-amber-300 bg-amber-50/60 shadow-xs">
+        <div className="flex items-center gap-2 font-bold text-amber-900 text-sm font-cinzel">
+          <ShieldCheck className="w-5 h-5 text-amber-700" />
           Zero Fabrication & Ethical Publishing Protocol
         </div>
-        <p className="leading-relaxed">
+        <p className="leading-relaxed font-sans">
           In accordance with national cultural integrity standards, Parampara AR Lite never publishes unverified claims as facts. Submissions enter a strict <strong>PENDING</strong> review queue. Only verified community narratives with explicit consent become eligible for inclusion.
         </p>
       </div>
 
       {/* Success View */}
       {submittedContribution ? (
-        <div className="bg-white rounded-2xl border-2 border-emerald-400 p-8 shadow-lg text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-            <CheckCircle2 className="w-8 h-8" />
+        <div className="bg-white rounded-3xl border-2 border-emerald-400 p-8 sm:p-10 shadow-xl text-center space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-sm">
+            <CheckCircle2 className="w-9 h-9" />
           </div>
-          <h3 className="font-serif text-2xl font-bold text-slate-900">
+          <h3 className="font-cinzel text-2xl sm:text-3xl font-black text-slate-900">
             Contribution Submitted for Verification
           </h3>
-          <p className="text-sm text-slate-600 max-w-md mx-auto">
+          <p className="text-sm text-slate-600 max-w-md mx-auto font-sans">
             Thank you, <strong>{submittedContribution.contributor_name}</strong>. Your documentation regarding <strong>{submittedContribution.tradition_name}</strong> has been assigned Tracking ID #{submittedContribution.id}.
           </p>
 
-          <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl max-w-sm mx-auto text-xs space-y-1">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl max-w-sm mx-auto text-xs space-y-1.5 font-sans">
             <div className="flex justify-between">
               <span className="text-slate-500">Submission Status:</span>
               <span className="font-bold text-amber-600 uppercase tracking-wider">{submittedContribution.status}</span>
@@ -112,7 +112,7 @@ export const ContributePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-4 flex items-center justify-center gap-3">
+          <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={() => {
                 setSubmittedContribution(null);
@@ -129,13 +129,13 @@ export const ContributePage: React.FC = () => {
                   consent_given: false,
                 });
               }}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors"
+              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors cursor-pointer"
             >
               Submit Another Entry
             </button>
             <Link
               to="/admin"
-              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white transition-colors"
+              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-md transition-colors"
             >
               Go to Admin Verification Queue
             </Link>
@@ -143,19 +143,19 @@ export const ContributePage: React.FC = () => {
         </div>
       ) : (
         /* Form View */
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-[#E6D5C3] p-6 sm:p-8 shadow-sm space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-[#E6D5C3] p-6 sm:p-10 shadow-sm space-y-6">
           {errorMessage && (
-            <div className="bg-red-50 border border-red-300 text-red-900 p-4 rounded-xl text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+            <div className="bg-rose-50 border border-rose-300 text-rose-950 p-4 rounded-2xl text-xs flex items-center gap-2 font-sans">
+              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Contributor Name */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">
-                Full Contributor / Researcher Name <span className="text-red-500">*</span>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-cinzel">
+                Full Contributor / Researcher Name <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -164,14 +164,14 @@ export const ContributePage: React.FC = () => {
                 placeholder="e.g. Ramesh V. Kadu"
                 value={formData.contributor_name}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] bg-white font-sans"
               />
             </div>
 
             {/* Email */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">
-                Contact Email Address <span className="text-red-500">*</span>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-cinzel">
+                Contact Email Address <span className="text-rose-500">*</span>
               </label>
               <input
                 type="email"
@@ -180,22 +180,22 @@ export const ContributePage: React.FC = () => {
                 placeholder="contributor@example.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] bg-white font-sans"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {/* Tradition Name */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">
-                Heritage Tradition <span className="text-red-500">*</span>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-cinzel">
+                Heritage Tradition <span className="text-rose-500">*</span>
               </label>
               <select
                 name="tradition_name"
                 value={formData.tradition_name}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+                className="w-full px-3.5 py-3 rounded-2xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] font-sans"
               >
                 <option value="Warli Painting">Warli Painting (Maharashtra)</option>
                 <option value="Toda Embroidery">Toda Embroidery (Tamil Nadu)</option>
@@ -206,15 +206,15 @@ export const ContributePage: React.FC = () => {
             </div>
 
             {/* Region */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">
-                Geographic Region <span className="text-red-500">*</span>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-cinzel">
+                Geographic Region <span className="text-rose-500">*</span>
               </label>
               <select
                 name="region"
                 value={formData.region}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+                className="w-full px-3.5 py-3 rounded-2xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] font-sans"
               >
                 <option value="North">North India</option>
                 <option value="South">South India</option>
@@ -226,9 +226,9 @@ export const ContributePage: React.FC = () => {
             </div>
 
             {/* Location */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">
-                Specific Location / Village <span className="text-red-500">*</span>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-cinzel">
+                Specific Location / Village <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -237,15 +237,15 @@ export const ContributePage: React.FC = () => {
                 placeholder="e.g. Dahanu, Palghar"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] bg-white font-sans"
               />
             </div>
           </div>
 
           {/* Description */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-700">
-              Detailed Description of Practice or Object <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 font-cinzel">
+              Detailed Description of Practice or Object <span className="text-rose-500">*</span>
             </label>
             <textarea
               name="description"
@@ -254,13 +254,13 @@ export const ContributePage: React.FC = () => {
               placeholder="Describe the craft process, performance technique, musical instruments, or community rituals in detail (minimum 20 characters)..."
               value={formData.description}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+              className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] bg-white font-sans"
             ></textarea>
           </div>
 
           {/* Cultural Significance */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-700">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 font-cinzel">
               Cultural & Social Significance (Optional)
             </label>
             <textarea
@@ -269,14 +269,14 @@ export const ContributePage: React.FC = () => {
               placeholder="How does this tradition connect to local festivals, seasons, or sacred customs?"
               value={formData.cultural_significance}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+              className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] bg-white font-sans"
             ></textarea>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Media URL */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-cinzel">
                 Authentic Media URL (Optional)
               </label>
               <input
@@ -285,16 +285,16 @@ export const ContributePage: React.FC = () => {
                 placeholder="https://..."
                 value={formData.media_url}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] bg-white font-sans"
               />
-              <span className="text-[10px] text-slate-500 block">
+              <span className="text-[10px] text-slate-500 block font-sans">
                 Must be an authentic photograph, audio field recording, or archive link.
               </span>
             </div>
 
             {/* Source Reference */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-cinzel">
                 Reference / Community Source Citation
               </label>
               <input
@@ -303,13 +303,13 @@ export const ContributePage: React.FC = () => {
                 placeholder="e.g. Field documentation with Warli elders, 2026"
                 value={formData.source_reference}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412]"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-[#9A3412] bg-white font-sans"
               />
             </div>
           </div>
 
           {/* Explicit Consent Checkbox */}
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
             <label className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -318,7 +318,7 @@ export const ContributePage: React.FC = () => {
                 onChange={handleChange}
                 className="mt-1 h-4 w-4 rounded text-[#9A3412] focus:ring-orange-400 border-slate-300"
               />
-              <span className="text-xs text-slate-700 leading-relaxed">
+              <span className="text-xs text-slate-700 leading-relaxed font-sans">
                 <strong>Consent and Authenticity Agreement:</strong> I confirm that the submitted cultural information is authentic, ethically documented, and that appropriate community consent has been obtained. I understand it will be peer-reviewed prior to publication.
               </span>
             </label>
@@ -329,10 +329,10 @@ export const ContributePage: React.FC = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-lg shadow-orange-950/20 disabled:opacity-50 transition-all hover:scale-102"
+              className="flex items-center gap-2 px-8 py-4 rounded-2xl text-sm font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-xl shadow-orange-950/20 disabled:opacity-50 transition-all hover:scale-102 cursor-pointer"
             >
               <Send className="w-4 h-4" />
-              {submitting ? 'Submitting...' : 'Submit for Verification'}
+              <span>{submitting ? 'Submitting...' : 'Submit for Verification'}</span>
             </button>
           </div>
         </form>
@@ -340,3 +340,5 @@ export const ContributePage: React.FC = () => {
     </div>
   );
 };
+
+export default ContributePage;

@@ -13,11 +13,14 @@ import {
   HelpCircle,
   MessageSquareQuote,
   Calendar,
-  Layers
+  Layers,
+  Camera,
+  Volume2
 } from 'lucide-react';
 import { fetchTradition } from '../services/api';
 import { TraditionDetail } from '../types';
 import { SourceBadge } from '../components/SourceBadge';
+import { NarrationPlayer } from '../components/NarrationPlayer';
 
 export const TraditionDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -36,9 +39,11 @@ export const TraditionDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+      <div className="max-w-7xl mx-auto px-4 py-24 text-center">
         <div className="animate-spin w-10 h-10 border-4 border-[#9A3412] border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-slate-600 font-medium">Retrieving verified cultural documentation...</p>
+        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+          Retrieving verified cultural documentation...
+        </p>
       </div>
     );
   }
@@ -46,9 +51,9 @@ export const TraditionDetailPage: React.FC = () => {
   if (error || !tradition) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center space-y-4">
-        <h2 className="font-serif text-2xl font-bold text-slate-900">Tradition Not Found</h2>
+        <h2 className="font-cinzel text-2xl font-bold text-slate-900">Tradition Not Found</h2>
         <p className="text-slate-600">{error || 'The requested heritage tradition could not be located.'}</p>
-        <Link to="/explore" className="inline-block px-5 py-2.5 rounded-xl bg-[#9A3412] text-white font-bold text-sm">
+        <Link to="/explore" className="inline-block px-6 py-3 rounded-xl bg-[#9A3412] text-white font-bold text-sm shadow-md">
           Return to Explore
         </Link>
       </div>
@@ -109,32 +114,32 @@ export const TraditionDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="space-y-12 pb-24">
       {/* 1. HERO HEADER */}
-      <section className="relative overflow-hidden bg-slate-900 text-white min-h-[420px] flex items-end">
+      <section className="relative overflow-hidden bg-[#0B0F17] text-white min-h-[440px] flex items-end border-b border-amber-900/40">
         <img
-          src={tradition.hero_image}
+          src={tradition.hero_image || `/heritage-images/${tradition.slug}.jpg`}
           alt={tradition.name}
           className="absolute inset-0 w-full h-full object-cover opacity-35"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-[#0B0F17]/70 to-transparent"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10 w-full space-y-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 w-full space-y-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500 text-slate-950">
+            <span className="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500 text-slate-950 shadow-sm">
               {tradition.region} India • {tradition.state}
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/20 text-white backdrop-blur-sm border border-white/20">
+            <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/20 text-white backdrop-blur-md border border-white/20">
               {tradition.category}
             </span>
             {tradition.community && (
-              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-black/40 text-amber-200 border border-white/10">
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-black/50 text-amber-200 border border-white/10">
                 Community: {tradition.community}
               </span>
             )}
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl">
+          <h1 className="font-cinzel text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl">
             {tradition.name}
           </h1>
 
@@ -142,13 +147,13 @@ export const TraditionDetailPage: React.FC = () => {
             {tradition.short_description}
           </p>
 
-          <div className="pt-2 flex flex-wrap gap-3">
+          <div className="pt-2 flex flex-wrap items-center gap-3">
             <Link
-              to={`/tradition/${tradition.slug}/experience`}
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-lg transition-all hover:scale-102"
+              to={isWarli ? '/tradition/warli/ar' : `/tradition/${tradition.slug}/experience`}
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-xl transition-all hover:scale-102"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
-              Experience This Tradition
+              <span>Launch Interactive Experience</span>
             </Link>
 
             {isWarli && (
@@ -156,16 +161,17 @@ export const TraditionDetailPage: React.FC = () => {
                 to="/tradition/warli/ar"
                 className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md transition-colors"
               >
-                Launch WebAR
+                <Camera className="w-4 h-4 text-slate-950" />
+                <span>WebAR Camera View</span>
               </Link>
             )}
 
             <Link
               to={`/tradition/${tradition.slug}/quiz`}
-              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl text-sm font-bold bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm border border-white/20 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl text-sm font-bold bg-white/15 hover:bg-white/25 text-white backdrop-blur-md border border-white/20 transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
-              Knowledge Quiz
+              <span>Knowledge Quiz</span>
             </Link>
           </div>
         </div>
@@ -175,13 +181,36 @@ export const TraditionDetailPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Left 8 Cols: All Required Sections */}
         <div className="lg:col-span-8 space-y-8">
+          {/* MULTILINGUAL ORAL NARRATION CARD */}
+          <div className="glass-card rounded-3xl p-6 border border-[#E6D5C3] shadow-md space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412] font-cinzel">
+                <Volume2 className="w-4 h-4" />
+                Multilingual Oral History Player
+              </div>
+              <span className="text-[10px] uppercase font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded">
+                English • Hindi • Regional
+              </span>
+            </div>
+            <p className="text-xs text-slate-600">
+              Listen to authentic verified narration in your preferred language using voice synthesis:
+            </p>
+            <NarrationPlayer
+              traditionSlug={tradition.slug}
+              motifTitle={tradition.name}
+              motifContent={tradition.short_description}
+              culturalContext={tradition.description}
+              className="pt-1"
+            />
+          </div>
+
           {/* SECTION 1: ABOUT */}
-          <section className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E6D5C3] shadow-sm space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412]">
+          <section className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E6D5C3] shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412] font-cinzel">
               <BookOpen className="w-4 h-4" />
               Overview & Provenance
             </div>
-            <h2 className="font-serif text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
+            <h2 className="font-cinzel text-2xl font-black text-slate-900 border-b border-slate-100 pb-3">
               About {tradition.name}
             </h2>
             <p className="text-base text-slate-700 leading-relaxed font-sans">
@@ -190,12 +219,12 @@ export const TraditionDetailPage: React.FC = () => {
           </section>
 
           {/* SECTION 2: CULTURAL CONTEXT */}
-          <section className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E6D5C3] shadow-sm space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412]">
+          <section className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E6D5C3] shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412] font-cinzel">
               <Layers className="w-4 h-4" />
               Cultural Context & Lineage
             </div>
-            <h2 className="font-serif text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
+            <h2 className="font-cinzel text-2xl font-black text-slate-900 border-b border-slate-100 pb-3">
               Cultural Context
             </h2>
             <p className="text-base text-slate-700 leading-relaxed font-sans">
@@ -205,12 +234,12 @@ export const TraditionDetailPage: React.FC = () => {
           </section>
 
           {/* SECTION 3: HOW IT IS MADE / PRACTICED */}
-          <section className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E6D5C3] shadow-sm space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412]">
+          <section className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E6D5C3] shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412] font-cinzel">
               <Hammer className="w-4 h-4" />
               Traditional Techniques & Materials
             </div>
-            <h2 className="font-serif text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
+            <h2 className="font-cinzel text-2xl font-black text-slate-900 border-b border-slate-100 pb-3">
               How It Is Made / Practiced
             </h2>
             <p className="text-base text-slate-700 leading-relaxed font-sans">
@@ -219,12 +248,12 @@ export const TraditionDetailPage: React.FC = () => {
           </section>
 
           {/* SECTION 4: SYMBOLS / MOTIFS / PERFORMANCE */}
-          <section className="bg-amber-50/70 p-6 sm:p-8 rounded-2xl border border-amber-200 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-900">
+          <section className="bg-amber-50/70 p-6 sm:p-8 rounded-3xl border border-amber-200 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-900 font-cinzel">
               <Sparkles className="w-4 h-4 text-amber-700" />
               Iconography & Aesthetics
             </div>
-            <h2 className="font-serif text-2xl font-bold text-amber-950 border-b border-amber-200/80 pb-3">
+            <h2 className="font-cinzel text-2xl font-black text-amber-950 border-b border-amber-200/80 pb-3">
               Symbols / Motifs / Performance
             </h2>
             <p className="text-base text-amber-950/90 leading-relaxed font-sans">
@@ -233,12 +262,12 @@ export const TraditionDetailPage: React.FC = () => {
           </section>
 
           {/* SECTION 5: WHY IT MATTERS */}
-          <section className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E6D5C3] shadow-sm space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412]">
+          <section className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E6D5C3] shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412] font-cinzel">
               <Award className="w-4 h-4" />
               Community Worldview & Values
             </div>
-            <h2 className="font-serif text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
+            <h2 className="font-cinzel text-2xl font-black text-slate-900 border-b border-slate-100 pb-3">
               Why It Matters
             </h2>
             <p className="text-base text-slate-700 leading-relaxed font-sans">
@@ -250,7 +279,7 @@ export const TraditionDetailPage: React.FC = () => {
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                   Safeguarding & Transmission Context
                 </span>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed font-sans">
                   {tradition.preservation_context}
                 </p>
               </div>
@@ -258,14 +287,14 @@ export const TraditionDetailPage: React.FC = () => {
           </section>
 
           {/* SECTION 6: VERIFIED COMMUNITY VOICE */}
-          <section className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E6D5C3] shadow-sm space-y-4">
+          <section className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E6D5C3] shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700 font-cinzel">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   Ethical Community Archiving
                 </div>
-                <h2 className="font-serif text-2xl font-bold text-slate-900 mt-1">
+                <h2 className="font-cinzel text-2xl font-black text-slate-900 mt-1">
                   Community Voice
                 </h2>
               </div>
@@ -282,7 +311,7 @@ export const TraditionDetailPage: React.FC = () => {
                 {approvedContributions.map((c) => (
                   <div
                     key={c.id}
-                    className="p-5 rounded-xl border border-emerald-200 bg-emerald-50/40 space-y-3"
+                    className="p-5 rounded-2xl border border-emerald-200 bg-emerald-50/40 space-y-3"
                   >
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2 font-bold text-emerald-950">
@@ -295,12 +324,12 @@ export const TraditionDetailPage: React.FC = () => {
                       </span>
                     </div>
 
-                    <p className="text-sm text-slate-800 leading-relaxed italic">
+                    <p className="text-sm text-slate-800 leading-relaxed italic font-sans">
                       "{c.description}"
                     </p>
 
                     {c.cultural_significance && (
-                      <p className="text-xs text-emerald-900 bg-white/70 p-2.5 rounded-lg border border-emerald-200">
+                      <p className="text-xs text-emerald-900 bg-white/70 p-2.5 rounded-xl border border-emerald-200 font-sans">
                         <strong>Significance noted:</strong> {c.cultural_significance}
                       </p>
                     )}
@@ -313,9 +342,9 @@ export const TraditionDetailPage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="bg-[#FAF8F5] border border-dashed border-slate-300 rounded-xl p-6 text-center space-y-2">
+              <div className="bg-[#FAF8F5] border border-dashed border-slate-300 rounded-2xl p-6 text-center space-y-2">
                 <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-                  Community Voice records appear here only after explicit contributor consent and editorial verification against institutional archives. Unverified claims are never published as facts.
+                  Community Voice records appear here only after contributor consent and editorial verification against institutional archives. Unverified claims are never published as facts.
                 </p>
                 <Link
                   to="/contribute"
@@ -328,23 +357,24 @@ export const TraditionDetailPage: React.FC = () => {
           </section>
 
           {/* SECTION 7: INTERACTIVE EXPERIENCE CTA BOX */}
-          <div className="bg-gradient-to-br from-[#7C2D12] to-amber-950 text-white p-8 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="bg-gradient-to-br from-[#7C2D12] via-[#9A3412] to-amber-950 text-white p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-amber-300">
+              <span className="text-xs font-bold uppercase tracking-widest text-amber-300 font-cinzel">
                 Interactive Learning
               </span>
-              <h3 className="font-serif text-2xl font-bold">
+              <h3 className="font-cinzel text-2xl font-bold">
                 Experience This Tradition
               </h3>
-              <p className="text-sm text-amber-100/90 max-w-md">
+              <p className="text-sm text-amber-100/90 max-w-md font-sans">
                 Engage with {tradition.experience_type.replace('_', ' ').toLowerCase()} directly through our verified digital explorer.
               </p>
             </div>
             <Link
-              to={`/tradition/${tradition.slug}/experience`}
+              to={isWarli ? '/tradition/warli/ar' : `/tradition/${tradition.slug}/experience`}
               className="flex-shrink-0 flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold bg-amber-400 hover:bg-amber-300 text-amber-950 shadow-lg transition-transform hover:scale-105"
             >
-              Experience This Tradition <ChevronRight className="w-4 h-4" />
+              <span>Launch Experience</span>
+              <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -352,45 +382,45 @@ export const TraditionDetailPage: React.FC = () => {
         {/* Right 4 Cols: Sources, Quiz & Metadata Sidebar */}
         <div className="lg:col-span-4 space-y-8">
           {/* Quick Facts Card */}
-          <div className="bg-white p-6 rounded-2xl border border-[#E6D5C3] shadow-sm space-y-4">
-            <h3 className="font-serif font-bold text-lg text-slate-900 border-b border-slate-100 pb-2">
+          <div className="bg-white p-6 rounded-3xl border border-[#E6D5C3] shadow-sm space-y-4">
+            <h3 className="font-cinzel font-bold text-lg text-slate-900 border-b border-slate-100 pb-2">
               Heritage Metadata
             </h3>
-            <dl className="space-y-3 text-xs">
+            <dl className="space-y-3.5 text-xs">
               <div>
-                <dt className="text-slate-400 uppercase font-bold">Region</dt>
-                <dd className="font-semibold text-slate-800 text-sm mt-0.5">{tradition.region} India</dd>
+                <dt className="text-slate-400 uppercase font-bold tracking-wider">Region</dt>
+                <dd className="font-bold text-slate-900 text-sm mt-0.5">{tradition.region} India</dd>
               </div>
               <div>
-                <dt className="text-slate-400 uppercase font-bold">State / Territory</dt>
-                <dd className="font-semibold text-slate-800 text-sm mt-0.5">{tradition.state}</dd>
+                <dt className="text-slate-400 uppercase font-bold tracking-wider">State / Territory</dt>
+                <dd className="font-bold text-slate-900 text-sm mt-0.5">{tradition.state}</dd>
               </div>
               <div>
-                <dt className="text-slate-400 uppercase font-bold">Practicing Community</dt>
-                <dd className="font-semibold text-slate-800 text-sm mt-0.5">{tradition.community || 'Information under verification'}</dd>
+                <dt className="text-slate-400 uppercase font-bold tracking-wider">Practicing Community</dt>
+                <dd className="font-bold text-slate-900 text-sm mt-0.5">{tradition.community || 'Information under verification'}</dd>
               </div>
               <div>
-                <dt className="text-slate-400 uppercase font-bold">Experience Modality</dt>
-                <dd className="font-semibold text-[#9A3412] text-sm mt-0.5">{tradition.experience_type.replace('_', ' ')}</dd>
+                <dt className="text-slate-400 uppercase font-bold tracking-wider">Experience Modality</dt>
+                <dd className="font-bold text-[#9A3412] text-sm mt-0.5">{tradition.experience_type.replace('_', ' ')}</dd>
               </div>
             </dl>
           </div>
 
           {/* Quiz Card */}
-          <div className="bg-white p-6 rounded-2xl border border-[#E6D5C3] shadow-sm space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412]">
+          <div className="glass-card p-6 rounded-3xl border border-amber-300/80 shadow-md space-y-3 bg-amber-50/40">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#9A3412] font-cinzel">
               <HelpCircle className="w-4 h-4" />
               Active Learning
             </div>
-            <h3 className="font-serif font-bold text-lg text-slate-900">
+            <h3 className="font-cinzel font-bold text-lg text-slate-900">
               Verified Knowledge Quiz
             </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed font-sans">
               Test your understanding of {tradition.name} through multiple-choice questions grounded in primary archival dossiers.
             </p>
             <Link
               to={`/tradition/${tradition.slug}/quiz`}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-md transition-colors"
             >
               Take Quiz Now <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -400,11 +430,11 @@ export const TraditionDetailPage: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Award className="w-5 h-5 text-amber-600" />
-              <h3 className="font-serif font-bold text-lg text-slate-900">
+              <h3 className="font-cinzel font-bold text-lg text-slate-900">
                 Verified Archival Sources
               </h3>
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 leading-relaxed font-sans">
               Every claim on this page is traceable to the following institutional sources:
             </p>
 
@@ -419,3 +449,5 @@ export const TraditionDetailPage: React.FC = () => {
     </div>
   );
 };
+
+export default TraditionDetailPage;
