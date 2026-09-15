@@ -1,4 +1,6 @@
+# pyrefly: ignore [missing-import]
 import pytest
+# pyrefly: ignore [missing-import]
 from httpx import AsyncClient, ASGITransport
 from app.main import app
 
@@ -239,3 +241,116 @@ async def test_qr_code_generation_endpoint():
         res_dyn = await ac.get("/api/qr/dynamic/generate?url=https://parampara-api-oocd.onrender.com/scan/toda")
         assert res_dyn.status_code == 200
         assert res_dyn.headers["content-type"] == "image/png"
+
+
+@pytest.mark.asyncio
+async def test_contributor_auth_and_submissions():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        # Register a new contributor
+        reg_res = await ac.post("/api/contributions/auth/register", json={
+            "username": "test_artisan_2026",
+            "email": "artisan@heritage.org",
+            "password": "ArtisanPassword2026!"
+        })
+        assert reg_res.status_code in [201, 400]  # 400 if already created in persistent db
+        
+        # Login
+        login_res = await ac.post("/api/contributions/auth/login", json={
+            "username_or_email": "test_artisan_2026",
+            "password": "ArtisanPassword2026!"
+        })
+        assert login_res.status_code == 200
+        token_data = login_res.json()
+        assert "access_token" in token_data
+        token = token_data["access_token"]
+        auth_headers = {"Authorization": f"Bearer {token}"}
+
+        # Check me
+        me_res = await ac.get("/api/contributions/auth/me", headers=auth_headers)
+        assert me_res.status_code == 200
+        me_data = me_res.json()
+        assert me_data["username"] == "test_artisan_2026"
+        assert me_data["is_admin"] is False
+
+        # Submit contribution with auth token
+        sub_res = await ac.post("/api/contributions", headers=auth_headers, json={
+            "contributor_name": "Ramesh Artisan",
+            "email": "artisan@heritage.org",
+            "tradition_name": "Kashmir Pashmina Shawl Weaving",
+            "region": "North",
+            "location": "Srinagar, Jammu & Kashmir",
+            "description": "Traditional hand-spun and hand-woven fine cashmere wool weaving on wooden pit looms.",
+            "cultural_significance": "Century old craft tradition preserved across generations in Kashmir valley.",
+            "consent_given": True
+        })
+        assert sub_res.status_code == 201
+        new_contrib = sub_res.json()
+        assert new_contrib["user_id"] == me_data["id"]
+
+        # View my-submissions
+        my_res = await ac.get("/api/contributions/my-submissions", headers=auth_headers)
+        assert my_res.status_code == 200
+        my_items = my_res.json()
+        assert any(item["tradition_name"] == "Kashmir Pashmina Shawl Weaving" for item in my_items)
+
+
+@pytest.mark.asyncio
+async def test_admin_quizzes_and_hotspots_mastery():
+    import os
+    transport = ASGITransport(app=app)
+    admin_pass = os.getenv("ADMIN_PASSWORD") or os.getenv("ADMIN_DEFAULT_PASSWORD") or "ParamparaAdmin@2026"
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        admin_login = await ac.post("/api/admin/login", json={
+            "username": "admin",
+            "password": admin_pass
+        })
+        assert admin_login.status_code == 200
+        admin_token = admin_login.json()["access_token"]
+        admin_headers = {"Authorization": f"Bearer {admin_token}"}
+
+        # 1. Test Admin Quizzes endpoint
+        quizzes_res = await ac.get("/api/admin/quizzes", headers=admin_headers)
+        assert quizzes_res.status_code == 200
+        quizzes = quizzes_res.json()
+        assert len(quizzes) >= 4
+        first_quiz = quizzes[0]
+
+        # Add question to first quiz
+        new_q_res = await ac.post(f"/api/admin/quizzes/{first_quiz['id']}/questions", headers=admin_headers, json={
+            "question_text": "What material is traditionally used for shaping utensils?",
+            "explanation": "Wooden mallets and stone anvils are traditionally utilized by the artisans.",
+            "order_index": 99,
+            "options": [
+                {"option_text": "Wooden mallets and anvils", "is_correct": True, "order_index": 0},
+                {"option_text": "Plastic molds", "is_correct": False, "order_index": 1}
+            ]
+        })
+        assert new_q_res.status_code == 201
+        created_q = new_q_res.json()
+        q_id = created_q["id"]
+
+        # Update question
+        update_q_res = await ac.patch(f"/api/admin/questions/{q_id}", headers=admin_headers, json={
+            "explanation": "Updated institutional archival explanation from National ICH dossier."
+        })
+        assert update_q_res.status_code == 200
+        assert "Updated institutional" in update_q_res.json()["explanation"]
+
+        # Delete question
+        del_q_res = await ac.delete(f"/api/admin/questions/{q_id}", headers=admin_headers)
+        assert del_q_res.status_code == 200
+
+        # 2. Test Admin Hotspots endpoint
+        hotspots_res = await ac.get("/api/admin/hotspots", headers=admin_headers)
+        assert hotspots_res.status_code == 200
+        hotspots = hotspots_res.json()
+        assert len(hotspots) >= 6
+        first_hotspot = hotspots[0]
+
+        # Update hotspot
+        h_id = first_hotspot["id"]
+        update_h_res = await ac.patch(f"/api/admin/hotspots/{h_id}", headers=admin_headers, json={
+            "content": first_hotspot["content"]
+        })
+        assert update_h_res.status_code == 200

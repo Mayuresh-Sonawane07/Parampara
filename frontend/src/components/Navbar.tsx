@@ -15,13 +15,16 @@ import {
   ExternalLink,
   CheckCircle2,
   Camera,
-  Info
+  Info,
+  UserCheck
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [adminUser, setAdminUser] = useState<string>('Admin');
+  const [isContributorLoggedIn, setIsContributorLoggedIn] = useState(false);
+  const [contributorUser, setContributorUser] = useState<string>('Contributor');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -38,6 +41,11 @@ export const Navbar: React.FC = () => {
       const user = localStorage.getItem('parampara_admin_user') || 'Admin';
       setIsAdminLoggedIn(!!token);
       setAdminUser(user);
+
+      const contribToken = localStorage.getItem('parampara_contributor_token');
+      const contribName = localStorage.getItem('parampara_contributor_user') || 'Contributor';
+      setIsContributorLoggedIn(!!contribToken);
+      setContributorUser(contribName);
     };
 
     checkAuth();
@@ -379,6 +387,29 @@ export const Navbar: React.FC = () => {
               <span>Contribute</span>
             </Link>
 
+            {isContributorLoggedIn ? (
+              <Link
+                to="/contributor/dashboard"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  isActive('/contributor/dashboard')
+                    ? 'bg-emerald-700 text-white shadow-xs'
+                    : 'text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300'
+                }`}
+              >
+                <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>My Submissions</span>
+              </Link>
+            ) : (
+              <Link
+                to="/contributor/login"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-[#9A3412] hover:bg-orange-50 transition-all"
+                title="Contributor Sign In / Register"
+              >
+                <UserCheck className="w-3.5 h-3.5 text-slate-400" />
+                <span className="hidden xl:inline">Contributor Portal</span>
+              </Link>
+            )}
+
             <div className="h-6 w-px bg-[#E6D5C3] mx-1" />
 
             <Link
@@ -468,6 +499,26 @@ export const Navbar: React.FC = () => {
             <Send className="w-5 h-5 text-[#9A3412]" />
             Submit Community Heritage
           </Link>
+
+          {isContributorLoggedIn ? (
+            <Link
+              to="/contributor/dashboard"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold text-emerald-950 bg-emerald-50 border border-emerald-200 transition-colors"
+            >
+              <UserCheck className="w-5 h-5 text-emerald-600" />
+              Contributor Dashboard ({contributorUser})
+            </Link>
+          ) : (
+            <Link
+              to="/contributor/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold text-slate-700 hover:bg-orange-100/60 transition-colors"
+            >
+              <UserCheck className="w-5 h-5 text-[#9A3412]" />
+              Contributor Portal / Sign In
+            </Link>
+          )}
 
           <Link
             to="/about"

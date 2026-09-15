@@ -55,3 +55,17 @@ def get_current_admin(current_user: models.User = Depends(get_current_user)) -> 
             detail='Administrative privileges required'
         )
     return current_user
+
+oauth2_optional_scheme = OAuth2PasswordBearer(tokenUrl='/api/admin/login', auto_error=False)
+
+def get_optional_current_user(token: Optional[str] = Depends(oauth2_optional_scheme), db: Session = Depends(get_db)) -> Optional[models.User]:
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.ALGORITHM])
+        username: str = payload.get('sub')
+        if not username:
+            return None
+        return db.query(models.User).filter(models.User.username == username).first()
+    except Exception:
+        return None

@@ -18,7 +18,14 @@ import {
   Server,
   Sparkles,
   Database,
-  Volume2
+  Volume2,
+  HelpCircle,
+  Crosshair,
+  Compass,
+  Eye,
+  Check,
+  Globe,
+  Radio
 } from 'lucide-react';
 import {
   fetchAdminStats,
@@ -32,7 +39,13 @@ import {
   fetchAdminSources,
   createAdminSource,
   deleteAdminSource,
-  fetchAdminAudit
+  fetchAdminAudit,
+  fetchAdminQuizzes,
+  createAdminQuestion,
+  updateAdminQuestion,
+  deleteAdminQuestion,
+  fetchAdminHotspots,
+  updateAdminHotspot
 } from '../services/api';
 import {
   AdminStats,
@@ -41,23 +54,48 @@ import {
   Source,
   AdminAuditData,
   TraditionCreateInput,
-  SourceCreateInput
+  SourceCreateInput,
+  AdminQuizDetail,
+  AdminQuizQuestionItem,
+  AdminHotspotItem
 } from '../types';
+import { AdminLaunchpadTab } from '../components/admin/AdminLaunchpadTab';
+import { AdminQuizzesTab } from '../components/admin/AdminQuizzesTab';
+import { AdminHotspotsTab } from '../components/admin/AdminHotspotsTab';
 
 export const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'submissions';
+  const activeTab = searchParams.get('tab') || 'launchpad';
 
   const token = localStorage.getItem('parampara_admin_token');
   const adminUser = localStorage.getItem('parampara_admin_user') || 'Admin';
 
-  // State for all 4 genuine sections
+  // State for all genuine sections
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [traditions, setTraditions] = useState<AdminTradition[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
+  const [quizzes, setQuizzes] = useState<AdminQuizDetail[]>([]);
+  const [hotspots, setHotspots] = useState<AdminHotspotItem[]>([]);
   const [auditData, setAuditData] = useState<AdminAuditData | null>(null);
+
+  const [selectedQuizId, setSelectedQuizId] = useState<number | null>(null);
+  const [showAddQuestionModal, setShowAddQuestionModal] = useState(false);
+  const [newQuestion, setNewQuestion] = useState({
+    question_text: '',
+    explanation: '',
+    source_id: undefined as number | undefined,
+    order_index: 0,
+    options: [
+      { option_text: '', is_correct: true },
+      { option_text: '', is_correct: false },
+      { option_text: '', is_correct: false },
+      { option_text: '', is_correct: false }
+    ]
+  });
+  const [editingHotspot, setEditingHotspot] = useState<AdminHotspotItem | null>(null);
+  const [hotspotFilter, setHotspotFilter] = useState('');
 
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -140,6 +178,12 @@ export const AdminDashboardPage: React.FC = () => {
       } else if (activeTab === 'sources') {
         const srcData = await fetchAdminSources(token);
         setSources(srcData);
+      } else if (activeTab === 'quizzes') {
+        const qData = await fetchAdminQuizzes(token);
+        setQuizzes(qData);
+      } else if (activeTab === 'hotspots') {
+        const hData = await fetchAdminHotspots(token);
+        setHotspots(hData);
       } else if (activeTab === 'audit') {
         const aData = await fetchAdminAudit(token);
         setAuditData(aData);
@@ -404,7 +448,19 @@ export const AdminDashboardPage: React.FC = () => {
       )}
 
       {/* Admin Module Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
+        <button
+          onClick={() => setTab('launchpad')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'launchpad'
+              ? 'bg-slate-900 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <Compass className="w-4 h-4 text-amber-400" />
+          Master Site Launchpad
+        </button>
+
         <button
           onClick={() => setTab('submissions')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
@@ -426,7 +482,7 @@ export const AdminDashboardPage: React.FC = () => {
           }`}
         >
           <Layers className="w-4 h-4" />
-          Traditions Management ({stats?.total_traditions ?? 0})
+          Traditions ({stats?.total_traditions ?? 0})
         </button>
 
         <button
@@ -442,6 +498,30 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
 
         <button
+          onClick={() => setTab('quizzes')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'quizzes'
+              ? 'bg-[#9A3412] text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-orange-50'
+          }`}
+        >
+          <HelpCircle className="w-4 h-4" />
+          Quizzes & Questions
+        </button>
+
+        <button
+          onClick={() => setTab('hotspots')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'hotspots'
+              ? 'bg-[#9A3412] text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-orange-50'
+          }`}
+        >
+          <Crosshair className="w-4 h-4" />
+          WebAR & Hotspots
+        </button>
+
+        <button
           onClick={() => setTab('audit')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'audit'
@@ -453,6 +533,21 @@ export const AdminDashboardPage: React.FC = () => {
           System Health & Audit
         </button>
       </div>
+
+      {/* TAB 0: MASTER LAUNCHPAD */}
+      {activeTab === 'launchpad' && (
+        <AdminLaunchpadTab stats={stats} onNavigateTab={setTab} />
+      )}
+
+      {/* TAB: QUIZZES MANAGEMENT */}
+      {activeTab === 'quizzes' && (
+        <AdminQuizzesTab token={token || ''} quizzes={quizzes} onRefresh={loadData} />
+      )}
+
+      {/* TAB: HOTSPOTS MANAGEMENT */}
+      {activeTab === 'hotspots' && (
+        <AdminHotspotsTab token={token || ''} hotspots={hotspots} onRefresh={loadData} />
+      )}
 
       {/* TAB 1: SUBMISSIONS REVIEW */}
       {activeTab === 'submissions' && (

@@ -13,7 +13,11 @@ import {
   TraditionUpdateInput,
   SourceCreateInput,
   SourceUpdateInput,
-  AdminAuditData
+  AdminAuditData,
+  ContributorUser,
+  AdminQuizDetail,
+  AdminQuizQuestionItem,
+  AdminHotspotItem
 } from '../types';
 
 const envUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
@@ -65,10 +69,14 @@ export async function submitQuiz(
   return res.json();
 }
 
-export async function submitContribution(data: ContributionCreate): Promise<Contribution> {
+export async function submitContribution(data: ContributionCreate, token?: string | null): Promise<Contribution> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   const res = await fetch(`${API_BASE}/contributions`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(data),
   });
   if (!res.ok) {
@@ -259,6 +267,165 @@ export async function fetchAdminAudit(token: string): Promise<AdminAuditData> {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(`Failed to fetch system audit report`);
+  return res.json();
+}
+
+// ----------------- Contributor Authentication & Submissions -----------------
+export async function registerContributor(
+  username: string,
+  email: string,
+  password: string
+): Promise<{ access_token: string; token_type: string; username: string; is_admin: boolean }> {
+  const res = await fetch(`${API_BASE}/contributions/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, email, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Registration failed' }));
+    throw new Error(err.detail || 'Registration failed');
+  }
+  return res.json();
+}
+
+export async function loginContributor(
+  usernameOrEmail: string,
+  password: string
+): Promise<{ access_token: string; token_type: string; username: string; is_admin: boolean }> {
+  const res = await fetch(`${API_BASE}/contributions/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username_or_email: usernameOrEmail, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Login failed' }));
+    throw new Error(err.detail || 'Invalid contributor credentials');
+  }
+  return res.json();
+}
+
+export async function fetchContributorProfile(token: string): Promise<ContributorUser> {
+  const res = await fetch(`${API_BASE}/contributions/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to load contributor profile`);
+  return res.json();
+}
+
+export async function fetchMySubmissions(token: string): Promise<Contribution[]> {
+  const res = await fetch(`${API_BASE}/contributions/my-submissions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to fetch your contributions`);
+  return res.json();
+}
+
+// ----------------- Admin Quizzes Management -----------------
+export async function fetchAdminQuizzes(token: string): Promise<AdminQuizDetail[]> {
+  const res = await fetch(`${API_BASE}/admin/quizzes`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to fetch admin quizzes`);
+  return res.json();
+}
+
+export async function createAdminQuestion(
+  token: string,
+  quizId: number,
+  data: {
+    question_text: string;
+    explanation: string;
+    source_id?: number | null;
+    order_index?: number;
+    options: { option_text: string; is_correct: boolean; order_index?: number }[];
+  }
+): Promise<AdminQuizQuestionItem> {
+  const res = await fetch(`${API_BASE}/admin/quizzes/${quizId}/questions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to create question' }));
+    throw new Error(err.detail || 'Failed to create question');
+  }
+  return res.json();
+}
+
+export async function updateAdminQuestion(
+  token: string,
+  questionId: number,
+  data: {
+    question_text?: string;
+    explanation?: string;
+    source_id?: number | null;
+    order_index?: number;
+    options?: { option_text: string; is_correct: boolean; order_index?: number }[];
+  }
+): Promise<AdminQuizQuestionItem> {
+  const res = await fetch(`${API_BASE}/admin/questions/${questionId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to update question' }));
+    throw new Error(err.detail || 'Failed to update question');
+  }
+  return res.json();
+}
+
+export async function deleteAdminQuestion(token: string, questionId: number): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/admin/questions/${questionId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to delete question`);
+  return res.json();
+}
+
+// ----------------- Admin WebAR Hotspots Management -----------------
+export async function fetchAdminHotspots(token: string): Promise<AdminHotspotItem[]> {
+  const res = await fetch(`${API_BASE}/admin/hotspots`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to fetch admin hotspots`);
+  return res.json();
+}
+
+export async function updateAdminHotspot(
+  token: string,
+  hotspotId: number,
+  data: {
+    name?: string;
+    x?: number;
+    y?: number;
+    content?: string;
+    cultural_context?: string;
+    regional_perspective?: string;
+    audio_url?: string;
+    animation_type?: string;
+    source_id?: number | null;
+  }
+): Promise<AdminHotspotItem> {
+  const res = await fetch(`${API_BASE}/admin/hotspots/${hotspotId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to update hotspot' }));
+    throw new Error(err.detail || 'Failed to update hotspot');
+  }
   return res.json();
 }
 

@@ -339,3 +339,229 @@ def get_admin_audit(
         heritage_assets_verified=found_assets
     )
 
+# ----------------- Quizzes Management -----------------
+@router.get("/quizzes", response_model=List[schemas.AdminQuizDetail])
+def list_admin_quizzes(
+    current_admin: models.User = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    quizzes = db.query(models.Quiz).all()
+    results = []
+    for q in quizzes:
+        t = q.tradition
+        q_items = []
+        for qn in q.questions:
+            opts = [
+                schemas.AdminQuizOptionItem(
+                    id=o.id,
+                    question_id=o.question_id,
+                    option_text=o.option_text,
+                    is_correct=o.is_correct,
+                    order_index=o.order_index
+                )
+                for o in qn.options
+            ]
+            q_items.append(schemas.AdminQuizQuestionItem(
+                id=qn.id,
+                quiz_id=qn.quiz_id,
+                question_text=qn.question_text,
+                order_index=qn.order_index,
+                explanation=qn.explanation,
+                source_id=qn.source_id,
+                options=opts
+            ))
+        results.append(schemas.AdminQuizDetail(
+            id=q.id,
+            tradition_id=q.tradition_id,
+            tradition_name=t.name if t else "Unknown",
+            tradition_slug=t.slug if t else "",
+            title=q.title,
+            description=q.description,
+            questions=q_items
+        ))
+    return results
+
+@router.post("/quizzes/{quiz_id}/questions", response_model=schemas.AdminQuizQuestionItem, status_code=status.HTTP_201_CREATED)
+def create_admin_question(
+    quiz_id: int,
+    payload: schemas.AdminQuestionCreate,
+    current_admin: models.User = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    quiz = db.query(models.Quiz).filter(models.Quiz.id == quiz_id).first()
+    if not quiz:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quiz not found")
+
+    new_qn = models.QuizQuestion(
+        quiz_id=quiz_id,
+        question_text=payload.question_text,
+        order_index=payload.order_index,
+        explanation=payload.explanation,
+        source_id=payload.source_id
+    )
+    db.add(new_qn)
+    db.flush()
+
+    opts = []
+    for idx, opt_in in enumerate(payload.options):
+        opt = models.QuizOption(
+            question_id=new_qn.id,
+            option_text=opt_in.option_text,
+            is_correct=opt_in.is_correct,
+            order_index=opt_in.order_index if opt_in.order_index else idx
+        )
+        db.add(opt)
+        opts.append(opt)
+
+    db.commit()
+    db.refresh(new_qn)
+
+    return schemas.AdminQuizQuestionItem(
+        id=new_qn.id,
+        quiz_id=new_qn.quiz_id,
+        question_text=new_qn.question_text,
+        order_index=new_qn.order_index,
+        explanation=new_qn.explanation,
+        source_id=new_qn.source_id,
+        options=[
+            schemas.AdminQuizOptionItem(
+                id=o.id,
+                question_id=o.question_id,
+                option_text=o.option_text,
+                is_correct=o.is_correct,
+                order_index=o.order_index
+            ) for o in new_qn.options
+        ]
+    )
+
+@router.patch("/questions/{question_id}", response_model=schemas.AdminQuizQuestionItem)
+def update_admin_question(
+    question_id: int,
+    payload: schemas.AdminQuestionUpdate,
+    current_admin: models.User = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    qn = db.query(models.QuizQuestion).filter(models.QuizQuestion.id == question_id).first()
+    if not qn:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question not found")
+
+    if payload.question_text is not None:
+        qn.question_text = payload.question_text
+    if payload.explanation is not None:
+        qn.explanation = payload.explanation
+    if payload.source_id is not None:
+        qn.source_id = payload.source_id
+    if payload.order_index is not None:
+        qn.order_index = payload.order_index
+
+    if payload.options is not None:
+        # Replace options
+        for old_opt in qn.options:
+            db.delete(old_opt)
+        db.flush()
+        for idx, opt_in in enumerate(payload.options):
+            opt = models.QuizOption(
+                question_id=qn.id,
+                option_text=opt_in.option_text,
+                is_correct=opt_in.is_correct,
+                order_index=opt_in.order_index if opt_in.order_index else idx
+            )
+            db.add(opt)
+
+    db.commit()
+    db.refresh(qn)
+
+    return schemas.AdminQuizQuestionItem(
+        id=qn.id,
+        quiz_id=qn.quiz_id,
+        question_text=qn.question_text,
+        order_index=qn.order_index,
+        explanation=qn.explanation,
+        source_id=qn.source_id,
+        options=[
+            schemas.AdminQuizOptionItem(
+                id=o.id,
+                question_id=o.question_id,
+                option_text=o.option_text,
+                is_correct=o.is_correct,
+                order_index=o.order_index
+            ) for o in qn.options
+        ]
+    )
+
+@router.delete("/questions/{question_id}", status_code=status.HTTP_200_OK)
+def delete_admin_question(
+    question_id: int,
+    current_admin: models.User = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    qn = db.query(models.QuizQuestion).filter(models.QuizQuestion.id == question_id).first()
+    if not qn:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question not found")
+    db.delete(qn)
+    db.commit()
+    return {"message": f"Question #{question_id} deleted successfully"}
+
+# ----------------- WebAR Hotspots Management -----------------
+@router.get("/hotspots", response_model=List[schemas.AdminHotspotItem])
+def list_admin_hotspots(
+    current_admin: models.User = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    hotspots = db.query(models.ARHotspot).all()
+    results = []
+    for h in hotspots:
+        ar_exp = h.ar_experience
+        tradition = ar_exp.tradition if ar_exp else None
+        results.append(schemas.AdminHotspotItem(
+            id=h.id,
+            ar_experience_id=h.ar_experience_id,
+            tradition_name=tradition.name if tradition else "Unknown",
+            tradition_slug=tradition.slug if tradition else "",
+            name=h.name,
+            x=h.x,
+            y=h.y,
+            content=h.content,
+            cultural_context=h.cultural_context,
+            regional_perspective=h.regional_perspective,
+            audio_url=h.audio_url,
+            animation_type=h.animation_type,
+            source_id=h.source_id
+        ))
+    return results
+
+@router.patch("/hotspots/{hotspot_id}", response_model=schemas.AdminHotspotItem)
+def update_admin_hotspot(
+    hotspot_id: int,
+    payload: schemas.AdminHotspotUpdate,
+    current_admin: models.User = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    h = db.query(models.ARHotspot).filter(models.ARHotspot.id == hotspot_id).first()
+    if not h:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Hotspot not found")
+
+    update_dict = payload.model_dump(exclude_unset=True)
+    for k, v in update_dict.items():
+        setattr(h, k, v)
+
+    db.commit()
+    db.refresh(h)
+
+    ar_exp = h.ar_experience
+    tradition = ar_exp.tradition if ar_exp else None
+    return schemas.AdminHotspotItem(
+        id=h.id,
+        ar_experience_id=h.ar_experience_id,
+        tradition_name=tradition.name if tradition else "Unknown",
+        tradition_slug=tradition.slug if tradition else "",
+        name=h.name,
+        x=h.x,
+        y=h.y,
+        content=h.content,
+        cultural_context=h.cultural_context,
+        regional_perspective=h.regional_perspective,
+        audio_url=h.audio_url,
+        animation_type=h.animation_type,
+        source_id=h.source_id
+    )

@@ -45,7 +45,7 @@ def seed_database():
             organization='Ministry of Culture, Government of India & Sangeet Natak Akademi',
             author='Sangeet Natak Akademi',
             source_type='GOVERNMENT',
-            url='https://indiaculture.gov.in/intangible-cultural-heritage',
+            url='https://sangeetnatak.gov.in/',
             description='Official repository documentation for traditional craftsmanship in metalsmithing in Jandiala Guru, Punjab.',
             verification_status='VERIFIED'
         )
@@ -54,7 +54,7 @@ def seed_database():
             organization='Geographical Indications Registry, Government of India',
             author='Office of the Controller General of Patents, Designs & Trade Marks',
             source_type='GOVERNMENT',
-            url='https://ipindia.gov.in',
+            url='https://ipindia.gov.in/',
             description='Geographical Indication registration Certificate No. 187, registered in 2013 for Toda Embroidery in Tamil Nadu.',
             verification_status='VERIFIED'
         )
@@ -63,7 +63,7 @@ def seed_database():
             organization='Development Commissioner (Handicrafts), Ministry of Textiles, Government of India',
             author='Development Commissioner (Handicrafts)',
             source_type='GOVERNMENT',
-            url='http://handicrafts.nic.in',
+            url='https://indian.handicrafts.gov.in/',
             description='Documentation of traditional counted-thread embroidery techniques and motifs of the Toda community.',
             verification_status='VERIFIED'
         )
@@ -81,7 +81,7 @@ def seed_database():
             organization='Sangeet Natak Akademi, Government of India',
             author='Sangeet Natak Akademi',
             source_type='GOVERNMENT',
-            url='https://sangeetnatak.gov.in',
+            url='https://sangeetnatak.gov.in/',
             description='Comprehensive institutional documentation on regional variations, masks, music, and martial footwork of Chhau.',
             verification_status='VERIFIED'
         )
@@ -90,7 +90,7 @@ def seed_database():
             organization='Indian National Trust for Art and Cultural Heritage (INTACH)',
             author='INTACH Dahanu Chapter (Phiroza Tafti & Pallavi Ganju)',
             source_type='INTACH',
-            url='http://intach.org',
+            url='https://www.intach.org/',
             description='Field research documenting intangible cultural heritage, sacred iconography, music, and folklore of the Warli community (2015).',
             verification_status='VERIFIED'
         )
@@ -99,7 +99,7 @@ def seed_database():
             organization='Geographical Indications Registry, Government of India',
             author='Office of the Controller General of Patents, Designs & Trade Marks',
             source_type='GOVERNMENT',
-            url='https://ipindia.gov.in',
+            url='https://ipindia.gov.in/',
             description='GI Registration Certificate No. 211, registered March 31, 2014, protecting traditional Warli tribal paintings.',
             verification_status='VERIFIED'
         )

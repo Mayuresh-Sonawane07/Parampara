@@ -147,6 +147,7 @@ class ContributionResponse(BaseModel):
     consent_given: bool
     status: str
     reviewer_notes: Optional[str] = None
+    user_id: Optional[int] = None
     created_at: datetime
 
 class ContributionUpdate(BaseModel):
@@ -264,3 +265,98 @@ class AdminAuditReport(BaseModel):
     metrics: dict
     narration_voice_engines: dict
     heritage_assets_verified: List[str]
+
+# ----------------- Contributor Authentication Schemas -----------------
+class ContributorRegisterRequest(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    email: EmailStr
+    password: str = Field(..., min_length=6)
+
+class ContributorLoginRequest(BaseModel):
+    username_or_email: str
+    password: str
+
+class ContributorProfileResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    username: str
+    email: str
+    is_admin: bool
+    created_at: datetime
+    contributions_count: int = 0
+
+# ----------------- Admin Quizzes Management Schemas -----------------
+class AdminQuizOptionItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    question_id: int
+    option_text: str
+    is_correct: bool
+    order_index: int
+
+class AdminQuizQuestionItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    quiz_id: int
+    question_text: str
+    order_index: int
+    explanation: str
+    source_id: Optional[int] = None
+    options: List[AdminQuizOptionItem] = []
+
+class AdminQuizDetail(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    tradition_id: int
+    tradition_name: str
+    tradition_slug: str
+    title: str
+    description: Optional[str] = None
+    questions: List[AdminQuizQuestionItem] = []
+
+class AdminOptionInput(BaseModel):
+    option_text: str
+    is_correct: bool
+    order_index: int = 0
+
+class AdminQuestionCreate(BaseModel):
+    question_text: str
+    explanation: str
+    source_id: Optional[int] = None
+    order_index: int = 0
+    options: List[AdminOptionInput]
+
+class AdminQuestionUpdate(BaseModel):
+    question_text: Optional[str] = None
+    explanation: Optional[str] = None
+    source_id: Optional[int] = None
+    order_index: Optional[int] = None
+    options: Optional[List[AdminOptionInput]] = None
+
+# ----------------- Admin Hotspots & WebAR Schemas -----------------
+class AdminHotspotItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    ar_experience_id: int
+    tradition_name: str
+    tradition_slug: str
+    name: str
+    x: float
+    y: float
+    content: str
+    cultural_context: Optional[str] = None
+    regional_perspective: Optional[str] = None
+    audio_url: Optional[str] = None
+    animation_type: str = "pulse"
+    source_id: Optional[int] = None
+
+class AdminHotspotUpdate(BaseModel):
+    name: Optional[str] = None
+    x: Optional[float] = None
+    y: Optional[float] = None
+    content: Optional[str] = None
+    cultural_context: Optional[str] = None
+    regional_perspective: Optional[str] = None
+    audio_url: Optional[str] = None
+    animation_type: Optional[str] = None
+    source_id: Optional[int] = None

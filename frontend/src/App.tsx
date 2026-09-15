@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -15,6 +15,8 @@ import { AboutPage } from './pages/AboutPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { ScanRouterPage } from './pages/ScanRouterPage';
+import { ContributorAuthPage } from './pages/ContributorAuthPage';
+import { ContributorDashboardPage } from './pages/ContributorDashboardPage';
 
 export const App: React.FC = () => {
   return (
@@ -29,8 +31,12 @@ export const App: React.FC = () => {
             <Route path="/tradition/:slug/experience" element={<ExperiencePage />} />
             <Route path="/tradition/warli/ar" element={<WarliARPage />} />
             <Route path="/tradition/:slug/quiz" element={<QuizPage />} />
+            <Route path="/quizzes" element={<QuizPage />} />
             <Route path="/posters" element={<PostersPage />} />
             <Route path="/contribute" element={<ContributePage />} />
+            <Route path="/contributor/login" element={<ContributorAuthPage />} />
+            <Route path="/contributor/register" element={<ContributorAuthPage />} />
+            <Route path="/contributor/dashboard" element={<ContributorDashboardPage />} />
             <Route path="/sources" element={<SourcesPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />

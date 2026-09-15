@@ -138,6 +138,7 @@ export interface Contribution {
   consent_given: boolean;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   reviewer_notes?: string;
+  user_id?: number | null;
   created_at: string;
 }
 
@@ -248,5 +249,58 @@ export interface AdminAuditData {
     cache_status: string;
   };
   heritage_assets_verified: string[];
+}
+
+export interface ContributorUser {
+  id: number;
+  username: string;
+  email: string;
+  is_admin: boolean;
+  created_at: string;
+  contributions_count: number;
+}
+
+export interface AdminQuizOptionItem {
+  id: number;
+  question_id: number;
+  option_text: string;
+  is_correct: boolean;
+  order_index: number;
+}
+
+export interface AdminQuizQuestionItem {
+  id: number;
+  quiz_id: number;
+  question_text: string;
+  order_index: number;
+  explanation: string;
+  source_id?: number | null;
+  options: AdminQuizOptionItem[];
+}
+
+export interface AdminQuizDetail {
+  id: number;
+  tradition_id: number;
+  tradition_name: string;
+  tradition_slug: string;
+  title: string;
+  description?: string;
+  questions: AdminQuizQuestionItem[];
+}
+
+export interface AdminHotspotItem {
+  id: number;
+  ar_experience_id: number;
+  tradition_name: string;
+  tradition_slug: string;
+  name: string;
+  x: number;
+  y: number;
+  content: string;
+  cultural_context?: string;
+  regional_perspective?: string;
+  audio_url?: string;
+  animation_type: string;
+  source_id?: number | null;
 }
 

@@ -5,8 +5,11 @@ import { submitContribution } from '../services/api';
 import { ContributionCreate, Contribution } from '../types';
 
 export const ContributePage: React.FC = () => {
+  const contributorToken = localStorage.getItem('parampara_contributor_token');
+  const contributorUser = localStorage.getItem('parampara_contributor_user');
+
   const [formData, setFormData] = useState<ContributionCreate>({
-    contributor_name: '',
+    contributor_name: contributorUser || '',
     email: '',
     tradition_name: 'Warli Painting',
     region: 'West',
@@ -48,7 +51,7 @@ export const ContributePage: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const result = await submitContribution(formData);
+      const result = await submitContribution(formData, contributorToken);
       setSubmittedContribution(result);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to submit contribution.');
@@ -84,6 +87,33 @@ export const ContributePage: React.FC = () => {
         </p>
       </div>
 
+      {/* Contributor Account Prompt */}
+      {contributorToken ? (
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <span>Logged in as <strong>{contributorUser}</strong>. This submission will be linked to your custodian profile.</span>
+          </div>
+          <Link to="/contributor/dashboard" className="font-bold text-emerald-800 hover:underline flex items-center gap-1">
+            View My Submissions Dashboard &rarr;
+          </Link>
+        </div>
+      ) : (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 text-slate-700 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#9A3412] flex-shrink-0" />
+            <span>Want to track the curation review status of your submission?</span>
+          </div>
+          <div className="flex items-center gap-2 font-sans">
+            <Link to="/contributor/login?redirect=/contribute" className="font-bold text-[#9A3412] hover:underline">
+              Sign In / Register Contributor &rarr;
+            </Link>
+            <span className="text-slate-400">&bull;</span>
+            <span className="text-slate-500">or submit as guest below</span>
+          </div>
+        </div>
+      )}
+
       {/* Success View */}
       {submittedContribution ? (
         <div className="bg-white rounded-3xl border-2 border-emerald-400 p-8 sm:p-10 shadow-xl text-center space-y-4">
@@ -117,7 +147,7 @@ export const ContributePage: React.FC = () => {
               onClick={() => {
                 setSubmittedContribution(null);
                 setFormData({
-                  contributor_name: '',
+                  contributor_name: contributorUser || '',
                   email: '',
                   tradition_name: 'Warli Painting',
                   region: 'West',
@@ -133,12 +163,21 @@ export const ContributePage: React.FC = () => {
             >
               Submit Another Entry
             </button>
-            <Link
-              to="/admin"
-              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-md transition-colors"
-            >
-              Go to Admin Verification Queue
-            </Link>
+            {contributorToken ? (
+              <Link
+                to="/contributor/dashboard"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-md transition-colors"
+              >
+                Track in My Dashboard &rarr;
+              </Link>
+            ) : (
+              <Link
+                to="/contributor/login"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#9A3412] hover:bg-[#7C2D12] text-white shadow-md transition-colors"
+              >
+                Create Account to Track Review
+              </Link>
+            )}
           </div>
         </div>
       ) : (

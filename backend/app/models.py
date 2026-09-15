@@ -187,10 +187,12 @@ class Contribution(Base):
     consent_given = Column(Boolean, default=False, nullable=False)
     status = Column(String(50), default='PENDING')  # PENDING, APPROVED, REJECTED
     reviewer_notes = Column(Text, nullable=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     created_at = Column(DateTime, default=utc_now)
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
 
     tradition = relationship('Tradition', back_populates='contributions')
+    user = relationship('User', backref='contributions')
 
 
 class User(Base):
@@ -200,5 +202,5 @@ class User(Base):
     username = Column(String(100), unique=True, index=True, nullable=False)
     email = Column(String(255), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    is_admin = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime, default=utc_now)
