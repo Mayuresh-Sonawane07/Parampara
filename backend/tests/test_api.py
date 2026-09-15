@@ -213,3 +213,29 @@ async def test_admin_auth_security():
         # Unauthorized access to protected route
         unauth_res = await ac.get("/api/admin/contributions")
         assert unauth_res.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_qr_code_generation_endpoint():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        # Default tradition QR
+        res = await ac.get("/api/qr/warli")
+        assert res.status_code == 200
+        assert res.headers["content-type"] == "image/png"
+        assert res.content[:4] == b"\x89PNG"
+        assert "scan/warli" in res.headers.get("x-qr-target-url", "")
+
+        # Custom base_url
+        res_custom = await ac.get("/api/qr/thathera?base_url=https://parampara-api-oocd.onrender.com")
+        assert res_custom.status_code == 200
+        assert res_custom.headers.get("x-qr-target-url") == "https://parampara-api-oocd.onrender.com/scan/thathera"
+
+        # Invalid slug returns 404
+        res_invalid = await ac.get("/api/qr/unknown-slug")
+        assert res_invalid.status_code == 404
+
+        # Custom dynamic URL generator
+        res_dyn = await ac.get("/api/qr/dynamic/generate?url=https://parampara-api-oocd.onrender.com/scan/toda")
+        assert res_dyn.status_code == 200
+        assert res_dyn.headers["content-type"] == "image/png"
