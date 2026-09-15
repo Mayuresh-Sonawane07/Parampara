@@ -15,6 +15,7 @@ class Settings:
     JWT_SECRET: str = os.getenv('JWT_SECRET', 'parampara-heritage-secret-key-change-in-prod')
     ALGORITHM: str = 'HS256'
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
-    FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+    _raw_frontend = os.getenv('FRONTEND_URL', '').strip()
+    FRONTEND_URL: str = 'https://parampara-api-oocd.onrender.com' if (not _raw_frontend or _raw_frontend == '*') else _raw_frontend.rstrip('/')
 
 settings = Settings()
